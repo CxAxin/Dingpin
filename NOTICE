@@ -1,0 +1,19 @@
+Pinnit (Flutter port)
+Copyright 2020 Sasikanth Miriyampalli
+
+This product includes software derived from the Pinnit project
+(https://github.com/msasikanth/pinnit), originally developed by
+Sasikanth Miriyampalli and licensed under the Apache License, Version 2.0.
+
+The original Pinnit is Copyright 2020 Sasikanth Miriyampalli, Apache-2.0.
+This Flutter port is provided under the same Apache License, Version 2.0
+for the portions derived from it.
+
+This Flutter port adds substantial original work (a full Flutter/Dart
+reimplementation, native Android notification handling, and keep-alive
+logic) on top of the concepts ported from the original Kotlin project.
+All files deriving from the original Pinnit carry a "modified" notice
+at the top of the file.
+
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
