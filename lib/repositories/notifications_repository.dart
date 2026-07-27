@@ -37,9 +37,6 @@ class NotificationsNotifier extends Notifier<List<PinnitNotification>> {
     } else {
       await NotificationService.instance.cancelPinned(n.uuid);
     }
-    if (n.hasSchedule) {
-      await NotificationService.instance.schedule(n);
-    }
     await _load();
   }
 
