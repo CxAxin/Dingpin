@@ -8,6 +8,7 @@ import 'package:pinnit_flutter/notifications/history_screen.dart';
 import 'package:pinnit_flutter/providers.dart';
 import 'package:pinnit_flutter/repositories/notifications_repository.dart';
 import 'package:pinnit_flutter/notifications/notification_tile.dart';
+import 'package:pinnit_flutter/about/about_screen.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -85,6 +86,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             tooltip: '通知历史',
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const HistoryScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: '关于',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AboutScreen()),
             ),
           ),
         ],
