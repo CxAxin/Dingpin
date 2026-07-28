@@ -151,10 +151,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contentLabel => 'Content (optional)';
 
   @override
-  String get pinToNotification => 'Pin to notification bar';
+  String get pinToNotification => 'Top to notification bar';
 
   @override
-  String get pinSubtitle => 'Keep it always visible in the notification bar';
+  String get pinSubtitle => 'Keep it pinned at the top of the bar';
 
   @override
   String get aboutTitle => 'About';
@@ -183,10 +183,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notePrefix => 'Note';
 
   @override
-  String get pinAction => 'Pin';
+  String get pinAction => 'Top';
 
   @override
-  String get unpinAction => 'Unpin';
+  String get unpinAction => 'Untop';
 
   @override
   String get language => 'Language';
@@ -199,4 +199,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get pinned => 'Topped to the bar';
+
+  @override
+  String get alreadyPinned => 'Already topped';
 }

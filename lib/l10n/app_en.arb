@@ -57,8 +57,8 @@
   "editNotification": "Edit notification",
   "titleLabel": "Title",
   "contentLabel": "Content (optional)",
-  "pinToNotification": "Pin to notification bar",
-  "pinSubtitle": "Keep it always visible in the notification bar",
+  "pinToNotification": "Top to notification bar",
+  "pinSubtitle": "Keep it pinned at the top of the bar",
   "aboutTitle": "About",
   "aboutSubtitle": "Pin important notifications to the bar, always visible.",
   "tapToCopyAccount": "Tap to copy the account name",
@@ -70,10 +70,12 @@
   "@notePrefix": {
     "description": "Prefix label before a user note on a history item"
   },
-  "pinAction": "Pin",
-  "unpinAction": "Unpin",
+  "pinAction": "Top",
+  "unpinAction": "Untop",
   "language": "Language",
   "languageSystem": "Follow system",
   "languageChinese": "Chinese",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+  "pinned": "Topped to the bar",
+  "alreadyPinned": "Already topped"
 }

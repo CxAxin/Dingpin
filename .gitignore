@@ -30,3 +30,9 @@ vendor/
 *.aab
 *.ipa
 
+# Local SDK configuration (do not commit)
+/android/local.properties
+
+# CMake / NDK build cache
+/android/app/.cxx/
+

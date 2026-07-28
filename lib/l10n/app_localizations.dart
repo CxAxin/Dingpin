@@ -353,13 +353,13 @@ abstract class AppLocalizations {
   /// No description provided for @pinToNotification.
   ///
   /// In en, this message translates to:
-  /// **'Pin to notification bar'**
+  /// **'Top to notification bar'**
   String get pinToNotification;
 
   /// No description provided for @pinSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Keep it always visible in the notification bar'**
+  /// **'Keep it pinned at the top of the bar'**
   String get pinSubtitle;
 
   /// No description provided for @aboutTitle.
@@ -413,13 +413,13 @@ abstract class AppLocalizations {
   /// No description provided for @pinAction.
   ///
   /// In en, this message translates to:
-  /// **'Pin'**
+  /// **'Top'**
   String get pinAction;
 
   /// No description provided for @unpinAction.
   ///
   /// In en, this message translates to:
-  /// **'Unpin'**
+  /// **'Untop'**
   String get unpinAction;
 
   /// No description provided for @language.
@@ -445,6 +445,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get languageEnglish;
+
+  /// No description provided for @pinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Topped to the bar'**
+  String get pinned;
+
+  /// No description provided for @alreadyPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Already topped'**
+  String get alreadyPinned;
 }
 
 class _AppLocalizationsDelegate

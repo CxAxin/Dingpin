@@ -88,6 +88,7 @@ class AboutScreen extends ConsumerWidget {
               onTap: () => _pickLanguage(context, ref, l10n),
             ),
           ),
+          const SizedBox(height: 16),
           const SizedBox(height: 24),
           Text(
             l10n.aboutFooter,

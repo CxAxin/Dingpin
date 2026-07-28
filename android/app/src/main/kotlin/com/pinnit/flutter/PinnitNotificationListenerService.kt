@@ -18,10 +18,23 @@ import android.service.notification.StatusBarNotification
 /// service and [onNotificationPosted] fires for every new notification.
 class PinnitNotificationListenerService : NotificationListenerService() {
 
+    companion object {
+        /// Set while the service lives so Dart can ask it to cancel a specific
+        /// third-party notification (used when "topping" a history entry).
+        var instance: PinnitNotificationListenerService? = null
+            private set
+    }
+
     override fun onCreate() {
         super.onCreate()
+        instance = this
         // Keep the process alive while the listener is active.
         PinnitForegroundService.start(this)
+    }
+
+    override fun onDestroy() {
+        instance = null
+        super.onDestroy()
     }
 
     override fun onListenerConnected() {

@@ -12,7 +12,7 @@ import 'package:pinnit_flutter/data/third_party_notification.dart';
 /// schedule) is preserved.
 class AppDatabase {
   static const _dbName = 'pinnit.db';
-  static const _dbVersion = 3;
+  static const _dbVersion = 5;
 
   static Database? _db;
 

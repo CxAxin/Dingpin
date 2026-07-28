@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:pinnit_flutter/data/app_database.dart';
+import 'package:pinnit_flutter/data/notification_model.dart';
 import 'package:pinnit_flutter/data/third_party_notification.dart';
 import 'package:pinnit_flutter/providers.dart';
+import 'package:pinnit_flutter/repositories/notifications_repository.dart';
 import 'package:pinnit_flutter/services/notification_listener_bridge.dart';
+import 'package:pinnit_flutter/services/notification_service.dart';
 import 'package:pinnit_flutter/l10n/app_localizations.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
@@ -112,12 +116,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     }
   }
 
-  void _showHistoryMenu(BuildContext context, ThirdPartyNotification n) {
-    final l10n = AppLocalizations.of(context);
+  void _showHistoryMenu(BuildContext tileContext, ThirdPartyNotification n) {
+    final l10n = AppLocalizations.of(tileContext);
     final notifier = ref.read(thirdPartyProvider.notifier);
-    final RenderBox tile = context.findRenderObject()! as RenderBox;
-    final offset = tile.localToGlobal(Offset.zero);
-    final size = tile.size;
+    final renderBox = tileContext.findRenderObject();
+    if (renderBox is! RenderBox) return;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
     showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
@@ -128,11 +133,19 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       ),
       items: [
         PopupMenuItem(
+          value: 'pin',
+          onTap: () => _pin(n),
+          child: ListTile(
+            leading: const Icon(Icons.vertical_align_top),
+            title: Text(l10n.pinAction),
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem(
           value: 'copy',
           onTap: () {
-            final text = [n.title, n.content, n.note]
-                .whereType<String>()
-                .join('\n');
+            final text =
+                [n.title, n.content, n.note].whereType<String>().join('\n');
             Clipboard.setData(ClipboardData(text: text));
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(l10n.copiedToClipboard)),
@@ -155,6 +168,62 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _pin(ThirdPartyNotification n) async {
+    final l10n = AppLocalizations.of(context);
+
+    // 通知可能只有内容没有标题；按「标题 → App 名 → 包名」兜底取值。
+    final title =
+        (n.title?.isNotEmpty == true) ? n.title! : (n.appName ?? n.packageName);
+    final rawContent = n.content;
+    final content = rawContent?.isNotEmpty == true ? rawContent : null;
+
+    // 去重：同一条通知没必要反复钉成多个 Pin。
+    final existing = await AppDatabase.notifications();
+    if (existing.any((p) => p.equalsTitleAndContent(title, content))) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.alreadyPinned)),
+        );
+      }
+      return;
+    }
+
+    // Android 13+ 需要通知权限才能发常驻通知。
+    final granted = await NotificationService.instance.requestPermission();
+    if (granted == false && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.needNotificationPermission),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
+    final pin = PinnitNotification(
+      title: title,
+      content: content,
+      isPinned: true,
+    );
+
+    try {
+      await ref.read(notificationsProvider.notifier).save(pin);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.saveFailed(e.toString()))),
+        );
+      }
+      return;
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.pinned)),
+      );
+    }
   }
 
   @override
@@ -261,49 +330,55 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                         ),
                         confirmDismiss: (_) async => true,
                         onDismissed: (_) => notifier.delete(n.uuid),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            child: Text(
-                              (n.appName ?? n.packageName)
-                                  .isNotEmpty
-                                  ? (n.appName ?? n.packageName)[0].toUpperCase()
-                                  : '?',
+                        child: Builder(
+                          builder: (tileCtx) => GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => _editNote(n),
+                            onLongPress: () => _showHistoryMenu(tileCtx, n),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                child: Text(
+                                  (n.appName ?? n.packageName).isNotEmpty
+                                      ? (n.appName ?? n.packageName)[0]
+                                          .toUpperCase()
+                                      : '?',
+                                ),
+                              ),
+                              title: Text(
+                                n.title?.isNotEmpty == true
+                                    ? n.title!
+                                    : (n.appName ?? n.packageName),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (n.content?.isNotEmpty == true)
+                                    Text(
+                                      n.content!,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${n.appName ?? n.packageName} · '
+                                    '${_formatTime(n.postedAt, l10n)}',
+                                    style: theme.textTheme.bodySmall,
+                                  ),
+                                  if (n.note?.isNotEmpty == true)
+                                    Text(
+                                      '${l10n.notePrefix}：${n.note}',
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              isThreeLine: true,
                             ),
                           ),
-                          title: Text(
-                            n.title?.isNotEmpty == true
-                                ? n.title!
-                                : (n.appName ?? n.packageName),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (n.content?.isNotEmpty == true)
-                                Text(
-                                  n.content!,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${n.appName ?? n.packageName} · '
-                                '${_formatTime(n.postedAt, l10n)}',
-                                style: theme.textTheme.bodySmall,
-                              ),
-                              if (n.note?.isNotEmpty == true)
-                                Text(
-                                  '${l10n.notePrefix}：${n.note}',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          isThreeLine: true,
-                          onTap: () => _editNote(n),
-                          onLongPress: () => _showHistoryMenu(context, n),
                         ),
                       );
                     },
@@ -351,9 +426,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              searching
-                  ? l10n.tryAnotherKeyword
-                  : l10n.historyEmptyHint,
+              searching ? l10n.tryAnotherKeyword : l10n.historyEmptyHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),

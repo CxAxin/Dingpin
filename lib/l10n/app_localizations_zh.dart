@@ -146,10 +146,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get contentLabel => '内容（可选）';
 
   @override
-  String get pinToNotification => '固定到通知栏';
+  String get pinToNotification => '顶到通知栏';
 
   @override
-  String get pinSubtitle => '让它一直显示在通知栏中';
+  String get pinSubtitle => '让它一直显示在通知栏顶部';
 
   @override
   String get aboutTitle => '关于';
@@ -176,10 +176,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notePrefix => '备注';
 
   @override
-  String get pinAction => '固定';
+  String get pinAction => '顶';
 
   @override
-  String get unpinAction => '取消固定';
+  String get unpinAction => '取消顶';
 
   @override
   String get language => '语言';
@@ -192,4 +192,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get pinned => '已顶到通知栏';
+
+  @override
+  String get alreadyPinned => '已经顶过了';
 }

@@ -42,8 +42,8 @@
   "editNotification": "编辑通知",
   "titleLabel": "标题",
   "contentLabel": "内容（可选）",
-  "pinToNotification": "固定到通知栏",
-  "pinSubtitle": "让它一直显示在通知栏中",
+  "pinToNotification": "顶到通知栏",
+  "pinSubtitle": "让它一直显示在通知栏顶部",
   "aboutTitle": "关于",
   "aboutSubtitle": "把重要通知固定到通知栏，随时可见。",
   "tapToCopyAccount": "点击复制公众号名",
@@ -52,10 +52,12 @@
   "apacheLicense": "Apache-2.0 许可 · 二次开发",
   "aboutFooter": "本应用基于 Apache-2.0 许可的 Pinnit 二次开发，仅供学习与交流。",
   "notePrefix": "备注",
-  "pinAction": "固定",
-  "unpinAction": "取消固定",
+  "pinAction": "顶",
+  "unpinAction": "取消顶",
   "language": "语言",
   "languageSystem": "跟随系统",
   "languageChinese": "中文",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+  "pinned": "已顶到通知栏",
+  "alreadyPinned": "已经顶过了"
 }
