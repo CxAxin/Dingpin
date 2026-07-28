@@ -8,8 +8,13 @@ package com.pinnit.flutter
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
+import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
+import androidx.core.content.FileProvider
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.embedding.engine.dart.DartExecutor
@@ -105,6 +110,28 @@ class PinnitApplication : Application() {
                     }
                 }
                 "isListenerEnabled" -> result.success(isListenerEnabled())
+                "shareFile" -> {
+                    val args = call.arguments as? Map<*, *>
+                    val path = args?.get("path") as? String
+                    val title = args?.get("title") as? String ?: "Export"
+                    if (path != null) {
+                        shareFile(path, title)
+                        result.success(null)
+                    } else {
+                        result.error("ARG", "path required", null)
+                    }
+                }
+                "saveFileToDownloads" -> {
+                    val args = call.arguments as? Map<*, *>
+                    val path = args?.get("path") as? String
+                    val name = args?.get("name") as? String ?: "pinnit_history.txt"
+                    if (path != null) {
+                        val ok = saveFileToDownloads(path, name)
+                        result.success(ok)
+                    } else {
+                        result.error("ARG", "path required", null)
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
@@ -186,5 +213,63 @@ class PinnitApplication : Application() {
             "enabled_notification_listeners"
         )
         return enabledListeners?.contains(packageName) ?: false
+    }
+
+    /// Share a local text file via the system share sheet (chooser), so the
+    /// user can send the exported history .txt to any app (WeChat, cloud drive,
+    /// Bluetooth…) without us touching scoped-storage permissions.
+    ///
+    /// The file must live under a path exposed by our [FileProvider]
+    /// (`${applicationId}.fileprovider`, see `res/xml/file_paths.xml`) so other
+    /// apps can read it under a temporary `FLAG_GRANT_READ_URI_PERMISSION`.
+    private fun shareFile(path: String, title: String) {
+        val file = java.io.File(path)
+        if (!file.exists()) return
+        val uri = FileProvider.getUriForFile(
+            applicationContext,
+            "$packageName.fileprovider",
+            file
+        )
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_TITLE, title)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val chooser = Intent.createChooser(intent, title)
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(chooser)
+    }
+
+    /// Save a local text file into the system Downloads folder so the user can
+    /// open it later from any file manager without depending on a third-party
+    /// sharing app. Uses MediaStore on API 29+ (no storage permission needed);
+    /// falls back to the legacy public Downloads path on older devices.
+    private fun saveFileToDownloads(srcPath: String, displayName: String): Boolean {
+        val src = java.io.File(srcPath)
+        if (!src.exists()) return false
+        val resolver = applicationContext.contentResolver
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, displayName)
+                    put(MediaStore.Downloads.MIME_TYPE, "text/plain")
+                    put(MediaStore.Downloads.RELATIVE_PATH, "Download/Pinnit")
+                }
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+                    ?: return false
+                resolver.openOutputStream(uri)?.use { out ->
+                    src.inputStream().use { it.copyTo(out) }
+                } ?: return false
+                true
+            } else {
+                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val target = java.io.File(dir, displayName)
+                src.copyTo(target, overwrite = true)
+                true
+            }
+        } catch (e: Exception) {
+            false
+        }
     }
 }

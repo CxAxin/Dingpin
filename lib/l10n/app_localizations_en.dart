@@ -205,4 +205,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alreadyPinned => 'Already topped';
+
+  @override
+  String get exportHistory => 'Export';
+
+  @override
+  String get exportHistoryTitle => 'Dingpin history';
+
+  @override
+  String get historyEmptyExport => 'History is empty, nothing to export';
+
+  @override
+  String exportFailed(Object error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get exportReady => 'Export file ready, choose an app to share';
+
+  @override
+  String get exportRangeHint => 'Choose a time range to export';
+
+  @override
+  String get rangeAll => 'All';
+
+  @override
+  String get rangeDay => 'Last 24 hours';
+
+  @override
+  String get rangeWeek => 'Last 7 days';
+
+  @override
+  String get rangeMonth => 'Last 30 days';
+
+  @override
+  String get saveToLocal => 'Save to device';
+
+  @override
+  String get shareExport => 'Share';
+
+  @override
+  String get ownPinLabel => 'Dingpin (created)';
+
+  @override
+  String get exportSavedLocal => 'Saved to the Download/Pinnit folder';
+
+  @override
+  String get exportEmptyRange => 'No notifications in this range';
 }

@@ -198,4 +198,51 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get alreadyPinned => '已经顶过了';
+
+  @override
+  String get exportHistory => '导出';
+
+  @override
+  String get exportHistoryTitle => '顶顶通知历史';
+
+  @override
+  String get historyEmptyExport => '历史还是空的，没有可导出的内容';
+
+  @override
+  String exportFailed(Object error) {
+    return '导出失败：$error';
+  }
+
+  @override
+  String get exportReady => '已生成导出文件，选择应用发送即可';
+
+  @override
+  String get exportRangeHint => '选择要导出的时间范围';
+
+  @override
+  String get rangeAll => '全部';
+
+  @override
+  String get rangeDay => '一天内';
+
+  @override
+  String get rangeWeek => '一周内';
+
+  @override
+  String get rangeMonth => '一个月内';
+
+  @override
+  String get saveToLocal => '保存到本地';
+
+  @override
+  String get shareExport => '分享';
+
+  @override
+  String get ownPinLabel => '顶顶（自建）';
+
+  @override
+  String get exportSavedLocal => '已保存到「下载 / Pinnit」文件夹';
+
+  @override
+  String get exportEmptyRange => '这个时间范围内没有可导出的通知';
 }

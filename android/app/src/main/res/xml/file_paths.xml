@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Exposes getCacheDir()/export/ to the system share sheet so other apps
+         can read the exported history .txt under a temporary grant. -->
+    <cache-path name="export" path="export/" />
+</paths>

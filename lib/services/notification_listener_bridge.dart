@@ -88,4 +88,36 @@ class NotificationListenerBridge {
       return false;
     }
   }
+
+  /// Share a local text file via the system share sheet. Used by the history
+  /// screen's "export" action so the user can send the exported `.txt` to any
+  /// app (WeChat, cloud drive, Bluetooth…) without scoped-storage hassle.
+  ///
+  /// [path] must be a file under the app cache dir exposed by the native
+  /// [FileProvider]; [title] is the chooser dialog title.
+  Future<void> shareFile(String path, String title) async {
+    try {
+      await _channel.invokeMethod<void>('shareFile', {
+        'path': path,
+        'title': title,
+      });
+    } on PlatformException {
+      rethrow;
+    }
+  }
+
+  /// Save a local text file into the system Downloads folder (via native
+  /// MediaStore) so the user can open it from any file manager without going
+  /// through a third-party sharing app. Returns true on success.
+  Future<bool> saveFileToDownloads(String path, String displayName) async {
+    try {
+      final ok = await _channel.invokeMethod<bool>('saveFileToDownloads', {
+        'path': path,
+        'name': displayName,
+      });
+      return ok ?? false;
+    } on PlatformException {
+      return false;
+    }
+  }
 }

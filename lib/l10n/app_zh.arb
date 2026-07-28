@@ -59,5 +59,20 @@
   "languageChinese": "中文",
   "languageEnglish": "English",
   "pinned": "已顶到通知栏",
-  "alreadyPinned": "已经顶过了"
+  "alreadyPinned": "已经顶过了",
+  "exportHistory": "导出",
+  "exportHistoryTitle": "顶顶通知历史",
+  "historyEmptyExport": "历史还是空的，没有可导出的内容",
+  "exportFailed": "导出失败：{error}",
+  "exportReady": "已生成导出文件，选择应用发送即可",
+  "exportRangeHint": "选择要导出的时间范围",
+  "rangeAll": "全部",
+  "rangeDay": "一天内",
+  "rangeWeek": "一周内",
+  "rangeMonth": "一个月内",
+  "saveToLocal": "保存到本地",
+  "shareExport": "分享",
+  "ownPinLabel": "顶顶（自建）",
+  "exportSavedLocal": "已保存到「下载 / Pinnit」文件夹",
+  "exportEmptyRange": "这个时间范围内没有可导出的通知"
 }

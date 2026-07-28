@@ -77,5 +77,20 @@
   "languageChinese": "Chinese",
   "languageEnglish": "English",
   "pinned": "Topped to the bar",
-  "alreadyPinned": "Already topped"
+  "alreadyPinned": "Already topped",
+  "exportHistory": "Export",
+  "exportHistoryTitle": "Dingpin history",
+  "historyEmptyExport": "History is empty, nothing to export",
+  "exportFailed": "Export failed: {error}",
+  "exportReady": "Export file ready, choose an app to share",
+  "exportRangeHint": "Choose a time range to export",
+  "rangeAll": "All",
+  "rangeDay": "Last 24 hours",
+  "rangeWeek": "Last 7 days",
+  "rangeMonth": "Last 30 days",
+  "saveToLocal": "Save to device",
+  "shareExport": "Share",
+  "ownPinLabel": "Dingpin (created)",
+  "exportSavedLocal": "Saved to the Download/Pinnit folder",
+  "exportEmptyRange": "No notifications in this range"
 }

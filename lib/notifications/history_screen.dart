@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:pinnit_flutter/data/app_database.dart';
 import 'package:pinnit_flutter/data/notification_model.dart';
@@ -10,6 +14,61 @@ import 'package:pinnit_flutter/repositories/notifications_repository.dart';
 import 'package:pinnit_flutter/services/notification_listener_bridge.dart';
 import 'package:pinnit_flutter/services/notification_service.dart';
 import 'package:pinnit_flutter/l10n/app_localizations.dart';
+
+/// Time-range presets for exporting notification history.
+enum ExportRange {
+  all,
+  day,
+  week,
+  month,
+}
+
+extension _ExportRangeX on ExportRange {
+  String label(AppLocalizations l10n) {
+    switch (this) {
+      case ExportRange.all:
+        return l10n.rangeAll;
+      case ExportRange.day:
+        return l10n.rangeDay;
+      case ExportRange.week:
+        return l10n.rangeWeek;
+      case ExportRange.month:
+        return l10n.rangeMonth;
+    }
+  }
+
+  /// Lower time bound (epoch millis) for filtering, or null for "all".
+  int? get cutoffMillis {
+    final now = DateTime.now();
+    switch (this) {
+      case ExportRange.all:
+        return null;
+      case ExportRange.day:
+        return now.subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+      case ExportRange.week:
+        return now.subtract(const Duration(days: 7)).millisecondsSinceEpoch;
+      case ExportRange.month:
+        return now.subtract(const Duration(days: 30)).millisecondsSinceEpoch;
+    }
+  }
+}
+
+/// Unified row for the export file: a captured third-party notification or a
+/// user-created pin.
+class _ExportItem {
+  final int timeMillis;
+  final String source;
+  final String? title;
+  final String? content;
+  final String? note;
+  _ExportItem({
+    required this.timeMillis,
+    required this.source,
+    this.title,
+    this.content,
+    this.note,
+  });
+}
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -226,6 +285,210 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     }
   }
 
+  /// Opens the export sheet: pick a time range, then either save to local
+  /// Downloads or share via the system sheet.
+  void _openExportSheet() {
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetCtx) {
+        var range = ExportRange.all;
+        return StatefulBuilder(
+          builder: (ctx, setSt) => Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              16,
+              20,
+              MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l10n.exportHistory,
+                    style: Theme.of(ctx).textTheme.titleLarge),
+                const SizedBox(height: 4),
+                Text(l10n.exportRangeHint,
+                    style: Theme.of(ctx).textTheme.bodySmall),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: ExportRange.values
+                      .map(
+                        (r) => ChoiceChip(
+                          label: Text(r.label(l10n)),
+                          selected: range == r,
+                          onSelected: (_) => setSt(() => range = r),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 22),
+                FilledButton.icon(
+                  icon: const Icon(Icons.download),
+                  label: Text(l10n.saveToLocal),
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _exportHistory(range, share: false);
+                  },
+                ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.ios_share),
+                  label: Text(l10n.shareExport),
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _exportHistory(range, share: true);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _exportHistory(ExportRange range, {required bool share}) async {
+    final l10n = AppLocalizations.of(context);
+
+    // 原始第三方通知历史 + 用户自己在「顶顶」里新建 / 顶出来的通知，合并导出。
+    final thirdParty = await AppDatabase.thirdPartyNotifications();
+    final ownPins = await AppDatabase.notifications();
+
+    final cutoff = range.cutoffMillis;
+
+    // 已导出的第三方「标题||内容」指纹，用于给自建通知去重
+    // （被「顶」过的第三方通知会同时出现在两份记录里，避免重复列出）。
+    final seen = <String>{};
+    final items = <_ExportItem>[];
+
+    for (final n in thirdParty) {
+      if (cutoff != null && n.postedAt < cutoff) continue;
+      final fp = '${n.title ?? ''}||${n.content ?? ''}';
+      seen.add(fp);
+      items.add(_ExportItem(
+        timeMillis: n.postedAt,
+        source: (n.appName?.isNotEmpty == true) ? n.appName! : n.packageName,
+        title: n.title,
+        content: n.content,
+        note: n.note,
+      ));
+    }
+
+    for (final p in ownPins) {
+      final t = p.createdAt.millisecondsSinceEpoch;
+      if (cutoff != null && t < cutoff) continue;
+      final fp = '${p.title}||${p.content ?? ''}';
+      if (seen.contains(fp)) continue; // 去重：避免和原始第三方通知重复
+      items.add(_ExportItem(
+        timeMillis: t,
+        source: l10n.ownPinLabel,
+        title: p.title,
+        content: p.content,
+        note: null,
+      ));
+    }
+
+    // 排序：时间倒序（最新的在最上面）。
+    items.sort((a, b) => b.timeMillis.compareTo(a.timeMillis));
+
+    // 空判断：完全没数据 vs 该时间范围没数据，提示文案不同。
+    final totalAll = thirdParty.length + ownPins.length;
+    if (totalAll == 0) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.historyEmptyExport)),
+        );
+      }
+      return;
+    }
+    if (items.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.exportEmptyRange)),
+        );
+      }
+      return;
+    }
+
+    try {
+      final now = DateTime.now();
+      final timeFmt = DateFormat('yyyy-MM-dd HH:mm');
+      final buffer = StringBuffer();
+      buffer
+        ..writeln('顶顶 通知历史导出')
+        ..writeln('导出时间：${timeFmt.format(now)}')
+        ..writeln('范围：${range.label(l10n)}')
+        ..writeln('共 ${items.length} 条')
+        ..writeln();
+      const divider = '────────────────────────────────────────';
+      for (var i = 0; i < items.length; i++) {
+        final it = items[i];
+        buffer
+          ..writeln(divider)
+          ..writeln('${i + 1}. ${it.source}')
+          ..writeln('   时间：${timeFmt.format(
+            DateTime.fromMillisecondsSinceEpoch(it.timeMillis),
+          )}');
+        if (it.title?.isNotEmpty == true) {
+          buffer.writeln('   标题：${it.title}');
+        }
+        if (it.content?.isNotEmpty == true) {
+          buffer.writeln('   内容：${it.content}');
+        }
+        if (it.note?.isNotEmpty == true) {
+          buffer.writeln('   备注：${it.note}');
+        }
+      }
+      buffer.writeln(divider);
+
+      final dir = await getTemporaryDirectory();
+      final exportDir = Directory('${dir.path}/export');
+      await exportDir.create(recursive: true);
+      final ts = DateFormat('yyyyMMdd_HHmm').format(now);
+      final file = File('${exportDir.path}/pinnit_history_$ts.txt');
+      await file.writeAsString(buffer.toString());
+
+      if (share) {
+        await NotificationListenerBridge.instance.shareFile(
+          file.path,
+          l10n.exportHistoryTitle,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.exportReady)),
+          );
+        }
+      } else {
+        final ok = await NotificationListenerBridge.instance.saveFileToDownloads(
+          file.path,
+          'pinnit_history_$ts.txt',
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(ok
+                  ? l10n.exportSavedLocal
+                  : l10n.exportFailed('保存到本地失败')),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.exportFailed(e.toString()))),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -254,6 +517,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               _searching = !_searching;
               if (!_searching) _searchController.clear();
             }),
+          ),
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: l10n.exportHistory,
+            onPressed: _openExportSheet,
           ),
           if (!_searching)
             PopupMenuButton<String>(

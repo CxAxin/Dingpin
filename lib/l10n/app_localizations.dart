@@ -457,6 +457,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Already topped'**
   String get alreadyPinned;
+
+  /// No description provided for @exportHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportHistory;
+
+  /// No description provided for @exportHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dingpin history'**
+  String get exportHistoryTitle;
+
+  /// No description provided for @historyEmptyExport.
+  ///
+  /// In en, this message translates to:
+  /// **'History is empty, nothing to export'**
+  String get historyEmptyExport;
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String exportFailed(Object error);
+
+  /// No description provided for @exportReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Export file ready, choose an app to share'**
+  String get exportReady;
+
+  /// No description provided for @exportRangeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a time range to export'**
+  String get exportRangeHint;
+
+  /// No description provided for @rangeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get rangeAll;
+
+  /// No description provided for @rangeDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 24 hours'**
+  String get rangeDay;
+
+  /// No description provided for @rangeWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get rangeWeek;
+
+  /// No description provided for @rangeMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get rangeMonth;
+
+  /// No description provided for @saveToLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to device'**
+  String get saveToLocal;
+
+  /// No description provided for @shareExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareExport;
+
+  /// No description provided for @ownPinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dingpin (created)'**
+  String get ownPinLabel;
+
+  /// No description provided for @exportSavedLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to the Download/Pinnit folder'**
+  String get exportSavedLocal;
+
+  /// No description provided for @exportEmptyRange.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications in this range'**
+  String get exportEmptyRange;
 }
 
 class _AppLocalizationsDelegate

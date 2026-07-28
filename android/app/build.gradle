@@ -58,4 +58,7 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    // FileProvider, used to share exported history .txt files via the system
+    // share sheet (exposes app cache files to other apps with a temporary grant).
+    implementation 'androidx.core:core-ktx:1.13.1'
 }
