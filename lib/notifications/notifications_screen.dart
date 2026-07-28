@@ -9,6 +9,7 @@ import 'package:pinnit_flutter/providers.dart';
 import 'package:pinnit_flutter/repositories/notifications_repository.dart';
 import 'package:pinnit_flutter/notifications/notification_tile.dart';
 import 'package:pinnit_flutter/about/about_screen.dart';
+import 'package:pinnit_flutter/l10n/app_localizations.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -41,6 +42,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final notifications = ref.watch(notificationsProvider);
     final notifier = ref.read(notificationsProvider.notifier);
 
@@ -52,13 +54,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: '搜索通知…',
+                decoration: InputDecoration(
+                  hintText: l10n.searchNotificationsHint,
                   border: InputBorder.none,
                 ),
                 onChanged: (_) => setState(() {}),
               )
-            : const Text('顶顶'),
+            : Text(l10n.appTitle),
         actions: [
           IconButton(
             icon: Icon(_searching ? Icons.close : Icons.search),
@@ -74,7 +76,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.brightness_6),
-            tooltip: '切换深色 / 浅色',
+            tooltip: l10n.toggleTheme,
             onPressed: () {
               final mode = ref.read(themeModeProvider);
               ref.read(themeModeProvider.notifier).state =
@@ -83,14 +85,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.history),
-            tooltip: '通知历史',
+            tooltip: l10n.tooltipHistory,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const HistoryScreen()),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.info_outline),
-            tooltip: '关于',
+            tooltip: l10n.tooltipAbout,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const AboutScreen()),
             ),
@@ -134,7 +136,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         Clipboard.setData(ClipboardData(text: text));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('已复制：$text'),
+                            content: Text(l10n.copiedWithText(text)),
                             duration: const Duration(seconds: 2),
                           ),
                         );
@@ -147,7 +149,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const EditorScreen()),
         ),
-        tooltip: '新建通知',
+        tooltip: l10n.tooltipNew,
         child: const Icon(Icons.add),
       ),
     );
@@ -160,6 +162,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Center(
       child: Padding(
@@ -171,14 +174,14 @@ class _EmptyState extends StatelessWidget {
                 size: 64, color: theme.colorScheme.primary.withValues(alpha: 0.6)),
             const SizedBox(height: 16),
             Text(
-              searching ? '没有匹配结果' : '还没有通知',
+              searching ? l10n.noMatch : l10n.noNotifications,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
               searching
-                  ? '换个关键词试试。'
-                  : '点击右下角的 + 按钮，把第一条通知固定到通知栏。',
+                  ? l10n.tryAnotherKeyword
+                  : l10n.emptyPinHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),

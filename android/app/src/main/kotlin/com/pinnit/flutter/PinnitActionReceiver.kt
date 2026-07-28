@@ -15,7 +15,7 @@ import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * Receives the "复制" / "取消固定" taps from a pinned notification's action
+ * Receives the copy / unpin taps from a pinned notification's action
  * buttons. Running as a BroadcastReceiver on the always-alive app process
  * (kept alive by [PinnitForegroundService]) means it fires reliably whether or
  * not the Flutter UI is currently on screen.
@@ -37,8 +37,13 @@ class PinnitActionReceiver : BroadcastReceiver() {
                 if (text.isNotBlank()) {
                     val cm =
                         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cm.setPrimaryClip(ClipData.newPlainText("顶顶", text))
-                    showToast(context, "已复制到剪贴板")
+                    cm.setPrimaryClip(
+                        ClipData.newPlainText(
+                            context.getString(R.string.clipboard_label),
+                            text,
+                        )
+                    )
+                    showToast(context, context.getString(R.string.copied_toast))
                 }
             }
 

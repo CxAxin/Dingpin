@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinnit_flutter/data/third_party_notification.dart';
 import 'package:pinnit_flutter/providers.dart';
 import 'package:pinnit_flutter/services/notification_listener_bridge.dart';
+import 'package:pinnit_flutter/l10n/app_localizations.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -42,20 +43,16 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     } on PlatformException {
       if (!mounted) return;
       // 跳转失败：给出手动路径引导。
+      final l10n = AppLocalizations.of(context);
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('无法自动打开设置'),
-          content: const Text(
-            '请手动开启「通知使用权」：\n\n'
-            '系统设置 → 通知与控制中心 → 通知使用权 → 找到 Pinnit，打开开关。\n\n'
-            '（不同小米系统版本名称略有差异，也可能在'
-            '「设置 → 应用设置 → 授权管理 → 通知使用权」）',
-          ),
+          title: Text(l10n.cannotOpenSettings),
+          content: Text(l10n.manualSettingsGuide),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('知道了'),
+              child: Text(l10n.gotIt),
             ),
           ],
         ),
@@ -82,26 +79,27 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   Future<void> _editNote(ThirdPartyNotification n) async {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: n.note ?? '');
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('添加备注'),
+        title: Text(l10n.addNote),
         content: TextField(
           controller: controller,
           maxLines: 3,
-          decoration: const InputDecoration(
-            hintText: '给这条通知写点备注…',
+          decoration: InputDecoration(
+            hintText: l10n.noteHint,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            child: const Text('保存'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -115,6 +113,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   void _showHistoryMenu(BuildContext context, ThirdPartyNotification n) {
+    final l10n = AppLocalizations.of(context);
     final notifier = ref.read(thirdPartyProvider.notifier);
     final RenderBox tile = context.findRenderObject()! as RenderBox;
     final offset = tile.localToGlobal(Offset.zero);
@@ -136,21 +135,21 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 .join('\n');
             Clipboard.setData(ClipboardData(text: text));
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('已复制到剪贴板')),
+              SnackBar(content: Text(l10n.copiedToClipboard)),
             );
           },
-          child: const ListTile(
-            leading: Icon(Icons.copy),
-            title: Text('复制'),
+          child: ListTile(
+            leading: const Icon(Icons.copy),
+            title: Text(l10n.copy),
             contentPadding: EdgeInsets.zero,
           ),
         ),
         PopupMenuItem(
           value: 'delete',
           onTap: () => notifier.delete(n.uuid),
-          child: const ListTile(
-            leading: Icon(Icons.delete, color: Colors.red),
-            title: Text('删除', style: TextStyle(color: Colors.red)),
+          child: ListTile(
+            leading: const Icon(Icons.delete, color: Colors.red),
+            title: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
             contentPadding: EdgeInsets.zero,
           ),
         ),
@@ -160,6 +159,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final history = ref.watch(thirdPartyProvider);
     final notifier = ref.read(thirdPartyProvider.notifier);
     final visible = _filter(history, _searchController.text);
@@ -171,13 +171,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: '搜索通知历史…',
+                decoration: InputDecoration(
+                  hintText: l10n.searchHistoryHint,
                   border: InputBorder.none,
                 ),
                 onChanged: (_) => setState(() {}),
               )
-            : const Text('通知历史'),
+            : Text(l10n.historyTitle),
         actions: [
           IconButton(
             icon: Icon(_searching ? Icons.close : Icons.search),
@@ -193,29 +193,27 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   showDialog<void>(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      title: const Text('清空历史？'),
-                      content: const Text(
-                        '这将永久删除所有已记录的通知。',
-                      ),
+                      title: Text(l10n.clearHistoryTitle),
+                      content: Text(l10n.clearHistoryBody),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(ctx).pop(),
-                          child: const Text('取消'),
+                          child: Text(l10n.cancel),
                         ),
                         TextButton(
                           onPressed: () {
                             Navigator.of(ctx).pop();
                             notifier.clearAll();
                           },
-                          child: const Text('清空'),
+                          child: Text(l10n.clearAll),
                         ),
                       ],
                     ),
                   );
                 }
               },
-              itemBuilder: (ctx) => const [
-                PopupMenuItem(value: 'clear', child: Text('清空全部')),
+              itemBuilder: (ctx) => [
+                PopupMenuItem(value: 'clear', child: Text(l10n.clearAllMenu)),
               ],
             ),
         ],
@@ -232,13 +230,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      '尚未开启通知使用权。开启后才会记录其他应用的通知。',
+                      l10n.listenerDisabledHint,
                       style: theme.textTheme.bodySmall,
                     ),
                   ),
                   TextButton(
                     onPressed: _openSettings,
-                    child: const Text('去开启'),
+                    child: Text(l10n.goEnable),
                   ),
                 ],
               ),
@@ -291,12 +289,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                               const SizedBox(height: 2),
                               Text(
                                 '${n.appName ?? n.packageName} · '
-                                '${_formatTime(n.postedAt)}',
+                                '${_formatTime(n.postedAt, l10n)}',
                                 style: theme.textTheme.bodySmall,
                               ),
                               if (n.note?.isNotEmpty == true)
                                 Text(
-                                  '备注：${n.note}',
+                                  '${l10n.notePrefix}：${n.note}',
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     fontStyle: FontStyle.italic,
                                   ),
@@ -316,14 +314,14 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  String _formatTime(int millis) {
+  String _formatTime(int millis, AppLocalizations l10n) {
     final dt = DateTime.fromMillisecondsSinceEpoch(millis);
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return '刚刚';
-    if (diff.inHours < 1) return '${diff.inMinutes} 分钟前';
-    if (diff.inDays < 1) return '${diff.inHours} 小时前';
-    if (diff.inDays < 7) return '${diff.inDays} 天前';
+    if (diff.inMinutes < 1) return l10n.justNow;
+    if (diff.inHours < 1) return l10n.minutesAgo(diff.inMinutes);
+    if (diff.inDays < 1) return l10n.hoursAgo(diff.inHours);
+    if (diff.inDays < 7) return l10n.daysAgo(diff.inDays);
     return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-'
         '${dt.day.toString().padLeft(2, '0')}';
   }
@@ -335,6 +333,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Center(
       child: Padding(
@@ -347,14 +346,14 @@ class _EmptyState extends StatelessWidget {
                 color: theme.colorScheme.primary.withValues(alpha: 0.6)),
             const SizedBox(height: 16),
             Text(
-              searching ? '没有匹配结果' : '还没有历史记录',
+              searching ? l10n.noMatch : l10n.noHistory,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
               searching
-                  ? '换个关键词试试。'
-                  : '开启通知使用权后，顶顶 会把其他应用的通知记录在这里。',
+                  ? l10n.tryAnotherKeyword
+                  : l10n.historyEmptyHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),

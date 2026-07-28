@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pinnit_flutter/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pinnit_flutter/data/app_database.dart';
 import 'package:pinnit_flutter/notifications/notifications_screen.dart';
 import 'package:pinnit_flutter/providers.dart';
@@ -24,6 +26,20 @@ class _PinnitAppState extends ConsumerState<PinnitApp> with WidgetsBindingObserv
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _restorePinnedNotifications();
+    _loadLocalePreference();
+  }
+
+  Future<void> _loadLocalePreference() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final value = prefs.getString(kLocalePrefKey);
+      if (mounted) {
+        ref.read(localeOverrideProvider.notifier).state =
+            localeFromPreference(value);
+      }
+    } catch (_) {
+      // Ignore — language simply stays at the default (follow system).
+    }
   }
 
   @override
@@ -65,21 +81,23 @@ class _PinnitAppState extends ConsumerState<PinnitApp> with WidgetsBindingObserv
   Widget build(BuildContext context) {
     // A simple in-memory theme mode toggle. Persisted theme is Phase 2.
     final themeMode = ref.watch(themeModeProvider);
+    final localeOverride = ref.watch(localeOverrideProvider);
 
     return MaterialApp(
       title: '顶顶',
       debugShowCheckedModeBanner: false,
-      // Force Chinese so system UI chrome (e.g. the text-selection "粘贴"
-      // button) is localized instead of falling back to English "Paste".
-      locale: const Locale('zh', 'CN'),
+      // `null` lets Flutter follow the system locale; a non-null value is the
+      // user's manual override (set from the About screen, persisted).
+      locale: localeOverride,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('zh', 'CN'),
-        Locale('en', 'US'),
+        Locale('zh'),
+        Locale('en'),
       ],
       theme: PinnitTheme.light,
       darkTheme: PinnitTheme.dark,

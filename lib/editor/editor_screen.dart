@@ -5,6 +5,7 @@ import 'package:pinnit_flutter/data/app_database.dart';
 import 'package:pinnit_flutter/data/notification_model.dart';
 import 'package:pinnit_flutter/repositories/notifications_repository.dart';
 import 'package:pinnit_flutter/services/notification_service.dart';
+import 'package:pinnit_flutter/l10n/app_localizations.dart';
 
 /// Create / edit screen. When [uuid] is null we are creating a new
 /// notification, otherwise we load the existing one and edit it.
@@ -52,10 +53,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('标题不能为空')),
+        SnackBar(content: Text(l10n.titleEmpty)),
       );
       return;
     }
@@ -67,9 +69,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       final granted = await NotificationService.instance.requestPermission();
       if (granted == false && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('需要通知权限才能固定到通知栏，请去系统设置中开启'),
-            duration: Duration(seconds: 4),
+          SnackBar(
+            content: Text(l10n.needNotificationPermission),
+            duration: const Duration(seconds: 4),
           ),
         );
         return;
@@ -90,7 +92,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存失败：$e')),
+          SnackBar(content: Text(l10n.saveFailed(e.toString()))),
         );
       }
       return;
@@ -101,18 +103,19 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.uuid == null ? '新建通知' : '编辑通知'),
+        title: Text(widget.uuid == null ? l10n.newNotification : l10n.editNotification),
         actions: [
           TextButton.icon(
             onPressed: _save,
             icon: const Icon(Icons.check),
-            label: const Text('保存'),
+            label: Text(l10n.save),
           ),
         ],
       ),
@@ -121,18 +124,18 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         children: [
           TextField(
             controller: _titleController,
-            decoration: const InputDecoration(
-              labelText: '标题',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.titleLabel,
+              border: const OutlineInputBorder(),
             ),
             textCapitalization: TextCapitalization.sentences,
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _contentController,
-            decoration: const InputDecoration(
-              labelText: '内容（可选）',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.contentLabel,
+              border: const OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
             maxLines: 5,
@@ -140,8 +143,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           ),
           const SizedBox(height: 8),
           SwitchListTile(
-            title: const Text('固定到通知栏'),
-            subtitle: const Text('让它一直显示在通知栏中'),
+            title: Text(l10n.pinToNotification),
+            subtitle: Text(l10n.pinSubtitle),
             value: _isPinned,
             onChanged: (v) => setState(() => _isPinned = v),
           ),

@@ -10,6 +10,32 @@ export 'package:pinnit_flutter/repositories/third_party_repository.dart'
 /// memory so the in-app toggle works during a session.
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
 
+/// User's language override. `null` means follow the system locale.
+final localeOverrideProvider = StateProvider<Locale?>((ref) => null);
+
+/// Persisted key used with `shared_preferences` for the language choice.
+const kLocalePrefKey = 'locale_preference';
+
+/// Maps the persisted preference string to a [Locale] override.
+///
+/// `null` (or "system") means follow the system; "zh"/"en" force a language.
+Locale? localeFromPreference(String? value) {
+  switch (value) {
+    case 'zh':
+      return const Locale('zh');
+    case 'en':
+      return const Locale('en');
+    default:
+      return null;
+  }
+}
+
+/// Serializes a [Locale] override back to the preference string.
+String localePreferenceValue(Locale? locale) {
+  if (locale == null) return 'system';
+  return locale.languageCode == 'zh' ? 'zh' : 'en';
+}
+
 /// Global [ProviderContainer] so non-widget singletons (e.g. [PinsBridge])
 /// can refresh providers in response to system / notification events.
 late ProviderContainer appContainer;

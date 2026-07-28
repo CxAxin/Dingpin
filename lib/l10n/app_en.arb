@@ -1,0 +1,79 @@
+{
+  "@@locale": "en",
+  "appTitle": "Dingpin",
+  "@appTitle": {
+    "description": "Application name shown in the UI"
+  },
+  "searchNotificationsHint": "Search notifications…",
+  "toggleTheme": "Toggle dark / light",
+  "tooltipHistory": "Notification history",
+  "tooltipAbout": "About",
+  "copiedWithText": "Copied: {text}",
+  "@copiedWithText": {
+    "description": "Snackbar shown after copying a notification; {text} is the copied content"
+  },
+  "tooltipNew": "New notification",
+  "noMatch": "No matching results",
+  "noNotifications": "No notifications yet",
+  "tryAnotherKeyword": "Try another keyword.",
+  "emptyPinHint": "Tap the + button to pin your first notification to the notification bar.",
+  "cannotOpenSettings": "Can't open settings automatically",
+  "manualSettingsGuide": "Please enable Notification access manually:\n\nSettings → Notifications & control center → Notification access → find Dingpin and turn it on.\n\n(Names vary slightly across MIUI versions; it may also be under Settings → Apps → Authorization & revocation → Notification access.)",
+  "@manualSettingsGuide": {
+    "description": "Manual path to enable the notification listener on MIUI"
+  },
+  "gotIt": "Got it",
+  "addNote": "Add note",
+  "noteHint": "Write a note for this notification…",
+  "cancel": "Cancel",
+  "save": "Save",
+  "copiedToClipboard": "Copied to clipboard",
+  "copy": "Copy",
+  "delete": "Delete",
+  "searchHistoryHint": "Search history…",
+  "historyTitle": "Notification history",
+  "clearHistoryTitle": "Clear history?",
+  "clearHistoryBody": "This permanently deletes all recorded notifications.",
+  "clearAll": "Clear",
+  "clearAllMenu": "Clear all",
+  "listenerDisabledHint": "Notification access is not enabled. Enable it to start recording other apps' notifications.",
+  "goEnable": "Enable",
+  "justNow": "Just now",
+  "minutesAgo": "{count} minutes ago",
+  "@minutesAgo": {
+    "description": "Relative time; {count} is the number of minutes"
+  },
+  "hoursAgo": "{count} hours ago",
+  "daysAgo": "{count} days ago",
+  "noHistory": "No history yet",
+  "historyEmptyHint": "After enabling notification access, Dingpin records other apps' notifications here.",
+  "titleEmpty": "Title can't be empty",
+  "needNotificationPermission": "Notification permission is required to pin to the bar. Please enable it in system settings.",
+  "saveFailed": "Save failed: {error}",
+  "@saveFailed": {
+    "description": "Save error message; {error} is the exception text"
+  },
+  "newNotification": "New notification",
+  "editNotification": "Edit notification",
+  "titleLabel": "Title",
+  "contentLabel": "Content (optional)",
+  "pinToNotification": "Pin to notification bar",
+  "pinSubtitle": "Keep it always visible in the notification bar",
+  "aboutTitle": "About",
+  "aboutSubtitle": "Pin important notifications to the bar, always visible.",
+  "tapToCopyAccount": "Tap to copy the account name",
+  "copiedAccount": "Copied account: Chaoshan Axing",
+  "basedOnPinnit": "Based on the Pinnit open-source project",
+  "apacheLicense": "Apache-2.0 license · derived work",
+  "aboutFooter": "This app is a derivative work of Pinnit under Apache-2.0, for learning and exchange.",
+  "notePrefix": "Note",
+  "@notePrefix": {
+    "description": "Prefix label before a user note on a history item"
+  },
+  "pinAction": "Pin",
+  "unpinAction": "Unpin",
+  "language": "Language",
+  "languageSystem": "Follow system",
+  "languageChinese": "Chinese",
+  "languageEnglish": "English"
+}

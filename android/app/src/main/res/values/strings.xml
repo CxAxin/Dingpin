@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">顶顶</string>
+    <string name="app_name">Dingpin</string>
+    <string name="pinned_channel_name">Pinned notification</string>
+    <string name="pinned_channel_desc">Notifications pinned to the panel</string>
+    <string name="pinned_default_title">Pinned notification</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_unpin">Unpin</string>
+    <string name="service_channel_name">Dingpin background service</string>
+    <string name="service_channel_desc">Keeps pinned notifications and the history listener running</string>
+    <string name="service_notification_title">Dingpin is running</string>
+    <string name="service_notification_text">Pinned notifications and history listener stay active</string>
+    <string name="clipboard_label">Dingpin</string>
+    <string name="copied_toast">Copied to clipboard</string>
 </resources>

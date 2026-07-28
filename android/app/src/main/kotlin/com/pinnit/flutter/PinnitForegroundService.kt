@@ -26,7 +26,6 @@ class PinnitForegroundService : Service() {
 
     companion object {
         const val CHANNEL_ID = "pinnit_service"
-        const val CHANNEL_NAME = "顶顶 后台服务"
         const val NOTIFICATION_ID = 0x4E87 // "Nu" ;)
 
         fun start(context: Context) {
@@ -69,10 +68,10 @@ class PinnitForegroundService : Service() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
             CHANNEL_ID,
-            CHANNEL_NAME,
+            getString(R.string.service_channel_name),
             NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "保持通知固定和监听服务运行"
+            description = getString(R.string.service_channel_desc)
             setShowBadge(false)
         }
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -96,8 +95,8 @@ class PinnitForegroundService : Service() {
         }
 
         return builder
-            .setContentTitle("顶顶 正在运行")
-            .setContentText("固定通知和通知历史监听服务保持活跃")
+            .setContentTitle(getString(R.string.service_notification_title))
+            .setContentText(getString(R.string.service_notification_text))
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pi)
             .setOngoing(true)

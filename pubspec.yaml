@@ -31,6 +31,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # Persist the user's language preference (follow system / zh / en)
+  shared_preferences: ^2.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

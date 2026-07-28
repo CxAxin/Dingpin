@@ -17,7 +17,7 @@ import android.os.Build
  * Native implementation of the "pinned to the panel" notification.
  *
  * We post these from Kotlin (instead of the Flutter local-notifications
- * plugin) so the action buttons ("复制" / "取消固定") are delivered to a native
+ * plugin) so the action buttons (copy / unpin) are delivered to a native
  * [PinnitActionReceiver] BroadcastReceiver. The plugin's
  * `onDidReceiveNotificationResponse` only fires dependably while the app is in
  * the foreground, but pinned notifications are tapped from the shade where the
@@ -26,8 +26,6 @@ import android.os.Build
 object PinnitPins {
 
     const val CHANNEL_ID = "pinnit_pinned"
-    const val CHANNEL_NAME = "固定通知"
-    const val CHANNEL_DESC = "固定到通知栏的通知"
     const val ACTION_COPY = "copy"
     const val ACTION_UNPIN = "unpin"
 
@@ -44,10 +42,10 @@ object PinnitPins {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                context.getString(R.string.pinned_channel_name),
                 NotificationManager.IMPORTANCE_MAX
             ).apply {
-                description = CHANNEL_DESC
+                description = context.getString(R.string.pinned_channel_desc)
                 setBypassDnd(true)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 setShowBadge(false)
@@ -69,7 +67,13 @@ object PinnitPins {
         val unpinIntent = actionIntent(context, uuid, ACTION_UNPIN, title, content, 2)
 
         val builder = Notification.Builder(context, CHANNEL_ID)
-            .setContentTitle(if (title.isNullOrBlank()) "固定通知" else title)
+            .setContentTitle(
+                if (title.isNullOrBlank()) {
+                    context.getString(R.string.pinned_default_title)
+                } else {
+                    title
+                }
+            )
             .setContentText(content)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(contentIntent)
@@ -79,8 +83,8 @@ object PinnitPins {
             .setCategory(Notification.CATEGORY_REMINDER)
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
-            .addAction(0, "复制", copyIntent)
-            .addAction(0, "取消固定", unpinIntent)
+            .addAction(0, context.getString(R.string.action_copy), copyIntent)
+            .addAction(0, context.getString(R.string.action_unpin), unpinIntent)
 
         if (!content.isNullOrBlank()) {
             builder.style = Notification.BigTextStyle().bigText(content)
