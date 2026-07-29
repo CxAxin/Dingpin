@@ -252,4 +252,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportEmptyRange => 'No notifications in this range';
+
+  @override
+  String get tabPinned => 'My Pins';
+
+  @override
+  String get tabHistory => 'History';
+
+  @override
+  String get tabAbout => 'About';
 }

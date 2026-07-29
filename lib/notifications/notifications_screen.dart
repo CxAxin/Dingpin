@@ -4,11 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pinnit_flutter/data/notification_model.dart';
 import 'package:pinnit_flutter/editor/editor_screen.dart';
-import 'package:pinnit_flutter/notifications/history_screen.dart';
 import 'package:pinnit_flutter/providers.dart';
 import 'package:pinnit_flutter/repositories/notifications_repository.dart';
 import 'package:pinnit_flutter/notifications/notification_tile.dart';
-import 'package:pinnit_flutter/about/about_screen.dart';
 import 'package:pinnit_flutter/l10n/app_localizations.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -83,20 +81,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: l10n.tooltipHistory,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            tooltip: l10n.tooltipAbout,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AboutScreen()),
-            ),
-          ),
         ],
       ),
       body: visible.isEmpty
@@ -104,7 +88,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           : ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: visible.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final n = visible[index];
                 return Dismissible(
@@ -120,7 +104,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     return true;
                   },
                   onDismissed: (_) => notifier.delete(n),
-                    child: NotificationTile(
+                    child: Card(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      child: NotificationTile(
                       notification: n,
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(
@@ -142,16 +129,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         );
                       },
                     ),
+                    ),
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const EditorScreen()),
-        ),
-        tooltip: l10n.tooltipNew,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

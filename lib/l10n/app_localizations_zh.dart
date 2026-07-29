@@ -245,4 +245,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exportEmptyRange => '这个时间范围内没有可导出的通知';
+
+  @override
+  String get tabPinned => '自建';
+
+  @override
+  String get tabHistory => '历史';
+
+  @override
+  String get tabAbout => '我的';
 }

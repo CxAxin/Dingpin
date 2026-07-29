@@ -74,5 +74,8 @@
   "shareExport": "分享",
   "ownPinLabel": "顶顶（自建）",
   "exportSavedLocal": "已保存到「下载 / Pinnit」文件夹",
-  "exportEmptyRange": "这个时间范围内没有可导出的通知"
+  "exportEmptyRange": "这个时间范围内没有可导出的通知",
+  "tabPinned": "自建",
+  "tabHistory": "历史",
+  "tabAbout": "我的"
 }

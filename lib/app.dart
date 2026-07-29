@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinnit_flutter/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pinnit_flutter/data/app_database.dart';
-import 'package:pinnit_flutter/notifications/notifications_screen.dart';
+import 'package:pinnit_flutter/home/main_screen.dart';
 import 'package:pinnit_flutter/providers.dart';
 import 'package:pinnit_flutter/services/notification_service.dart';
 import 'package:pinnit_flutter/theme/theme.dart';
@@ -103,7 +103,7 @@ class _PinnitAppState extends ConsumerState<PinnitApp> with WidgetsBindingObserv
       darkTheme: PinnitTheme.dark,
       themeMode: themeMode,
       navigatorKey: navigatorKey,
-      home: const NotificationsScreen(),
+      home: const MainScreen(),
     );
   }
 }

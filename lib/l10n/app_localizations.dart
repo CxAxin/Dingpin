@@ -547,6 +547,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No notifications in this range'**
   String get exportEmptyRange;
+
+  /// No description provided for @tabPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'My Pins'**
+  String get tabPinned;
+
+  /// No description provided for @tabHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get tabHistory;
+
+  /// No description provided for @tabAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get tabAbout;
 }
 
 class _AppLocalizationsDelegate

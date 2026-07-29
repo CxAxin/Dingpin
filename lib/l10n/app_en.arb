@@ -92,5 +92,8 @@
   "shareExport": "Share",
   "ownPinLabel": "Dingpin (created)",
   "exportSavedLocal": "Saved to the Download/Pinnit folder",
-  "exportEmptyRange": "No notifications in this range"
+  "exportEmptyRange": "No notifications in this range",
+  "tabPinned": "My Pins",
+  "tabHistory": "History",
+  "tabAbout": "About"
 }

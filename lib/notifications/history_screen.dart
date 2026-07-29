@@ -584,7 +584,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 : ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: visible.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final n = visible[index];
                       return Dismissible(
@@ -603,8 +603,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                             behavior: HitTestBehavior.opaque,
                             onTap: () => _editNote(n),
                             onLongPress: () => _showHistoryMenu(tileCtx, n),
-                            child: ListTile(
-                              leading: CircleAvatar(
+                            child: Card(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 5),
+                              child: ListTile(
+                                leading: CircleAvatar(
                                 child: Text(
                                   (n.appName ?? n.packageName).isNotEmpty
                                       ? (n.appName ?? n.packageName)[0]
@@ -645,6 +648,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                                 ],
                               ),
                               isThreeLine: true,
+                            ),
                             ),
                           ),
                         ),
