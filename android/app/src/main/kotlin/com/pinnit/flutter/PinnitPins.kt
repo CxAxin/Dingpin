@@ -11,7 +11,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
+import java.util.Locale
 
 /**
  * Native implementation of the "pinned to the panel" notification.
@@ -36,16 +38,17 @@ object PinnitPins {
         return (parsed and 0x7FFFFFFF).toInt()
     }
 
-    fun show(context: Context, uuid: String, title: String?, content: String?) {
-        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    fun show(context: Context, uuid: String, title: String?, content: String?, locale: String? = null) {
+        val localizedContext = locale?.let { createLocalizedContext(context, it) } ?: context
+        val nm = localizedContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                context.getString(R.string.pinned_channel_name),
+                localizedContext.getString(R.string.pinned_channel_name),
                 NotificationManager.IMPORTANCE_MAX
             ).apply {
-                description = context.getString(R.string.pinned_channel_desc)
+                description = localizedContext.getString(R.string.pinned_channel_desc)
                 setBypassDnd(true)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 setShowBadge(false)
@@ -54,22 +57,22 @@ object PinnitPins {
         }
 
         val contentIntent = PendingIntent.getActivity(
-            context,
+            localizedContext,
             idOf(uuid),
-            Intent(context, MainActivity::class.java).apply {
+            Intent(localizedContext, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra("uuid", uuid)
             },
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val copyIntent = actionIntent(context, uuid, ACTION_COPY, title, content, 1)
-        val unpinIntent = actionIntent(context, uuid, ACTION_UNPIN, title, content, 2)
+        val copyIntent = actionIntent(localizedContext, uuid, ACTION_COPY, title, content, 1)
+        val unpinIntent = actionIntent(localizedContext, uuid, ACTION_UNPIN, title, content, 2)
 
-        val builder = Notification.Builder(context, CHANNEL_ID)
+        val builder = Notification.Builder(localizedContext, CHANNEL_ID)
             .setContentTitle(
                 if (title.isNullOrBlank()) {
-                    context.getString(R.string.pinned_default_title)
+                    localizedContext.getString(R.string.pinned_default_title)
                 } else {
                     title
                 }
@@ -83,8 +86,8 @@ object PinnitPins {
             .setCategory(Notification.CATEGORY_REMINDER)
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
-            .addAction(0, context.getString(R.string.action_copy), copyIntent)
-            .addAction(0, context.getString(R.string.action_unpin), unpinIntent)
+            .addAction(0, localizedContext.getString(R.string.action_copy), copyIntent)
+            .addAction(0, localizedContext.getString(R.string.action_unpin), unpinIntent)
 
         if (!content.isNullOrBlank()) {
             builder.style = Notification.BigTextStyle().bigText(content)
@@ -96,6 +99,13 @@ object PinnitPins {
     fun cancel(context: Context, uuid: String) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.cancel(idOf(uuid))
+    }
+
+    private fun createLocalizedContext(context: Context, localeCode: String): Context {
+        val locale = Locale(localeCode)
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        return context.createConfigurationContext(config)
     }
 
     private fun actionIntent(

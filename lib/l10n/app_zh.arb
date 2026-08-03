@@ -73,8 +73,22 @@
   "saveToLocal": "保存到本地",
   "shareExport": "分享",
   "ownPinLabel": "顶顶（自建）",
-  "exportSavedLocal": "已保存到「下载 / Pinnit」文件夹",
+  "exportSavedLocal": "已保存到「下载 / 顶顶」文件夹",
   "exportEmptyRange": "这个时间范围内没有可导出的通知",
+  "exportHeader": "顶顶 通知历史导出",
+  "exportTimeLabel": "导出时间",
+  "exportRangeLabel": "范围",
+  "exportCountLabel": "共 {count} 条",
+  "@exportCountLabel": {
+    "description": "导出的通知数量",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "exportItemTimeLabel": "时间",
+  "exportItemTitleLabel": "标题",
+  "exportItemContentLabel": "内容",
+  "exportItemNoteLabel": "备注",
   "tabPinned": "自建",
   "tabHistory": "历史",
   "tabAbout": "我的"

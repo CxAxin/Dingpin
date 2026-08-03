@@ -241,10 +241,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ownPinLabel => '顶顶（自建）';
 
   @override
-  String get exportSavedLocal => '已保存到「下载 / Pinnit」文件夹';
+  String get exportSavedLocal => '已保存到「下载 / 顶顶」文件夹';
 
   @override
   String get exportEmptyRange => '这个时间范围内没有可导出的通知';
+
+  @override
+  String get exportHeader => '顶顶 通知历史导出';
+
+  @override
+  String get exportTimeLabel => '导出时间';
+
+  @override
+  String get exportRangeLabel => '范围';
+
+  @override
+  String exportCountLabel(int count) {
+    return '共 $count 条';
+  }
+
+  @override
+  String get exportItemTimeLabel => '时间';
+
+  @override
+  String get exportItemTitleLabel => '标题';
+
+  @override
+  String get exportItemContentLabel => '内容';
+
+  @override
+  String get exportItemNoteLabel => '备注';
 
   @override
   String get tabPinned => '自建';

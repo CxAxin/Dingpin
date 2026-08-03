@@ -419,7 +419,7 @@ abstract class AppLocalizations {
   /// No description provided for @unpinAction.
   ///
   /// In en, this message translates to:
-  /// **'Untop'**
+  /// **'Unpin'**
   String get unpinAction;
 
   /// No description provided for @language.
@@ -539,7 +539,7 @@ abstract class AppLocalizations {
   /// No description provided for @exportSavedLocal.
   ///
   /// In en, this message translates to:
-  /// **'Saved to the Download/Pinnit folder'**
+  /// **'Saved to the Download/Dingpin folder'**
   String get exportSavedLocal;
 
   /// No description provided for @exportEmptyRange.
@@ -547,6 +547,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No notifications in this range'**
   String get exportEmptyRange;
+
+  /// No description provided for @exportHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Dingpin notification history export'**
+  String get exportHeader;
+
+  /// No description provided for @exportTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export time'**
+  String get exportTimeLabel;
+
+  /// No description provided for @exportRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Range'**
+  String get exportRangeLabel;
+
+  /// Header line showing how many notifications were exported
+  ///
+  /// In en, this message translates to:
+  /// **'Total {count} items'**
+  String exportCountLabel(int count);
+
+  /// No description provided for @exportItemTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get exportItemTimeLabel;
+
+  /// No description provided for @exportItemTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get exportItemTitleLabel;
+
+  /// No description provided for @exportItemContentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get exportItemContentLabel;
+
+  /// No description provided for @exportItemNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get exportItemNoteLabel;
 
   /// No description provided for @tabPinned.
   ///

@@ -422,10 +422,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       final timeFmt = DateFormat('yyyy-MM-dd HH:mm');
       final buffer = StringBuffer();
       buffer
-        ..writeln('顶顶 通知历史导出')
-        ..writeln('导出时间：${timeFmt.format(now)}')
-        ..writeln('范围：${range.label(l10n)}')
-        ..writeln('共 ${items.length} 条')
+        ..writeln(l10n.exportHeader)
+        ..writeln('${l10n.exportTimeLabel}: ${timeFmt.format(now)}')
+        ..writeln('${l10n.exportRangeLabel}: ${range.label(l10n)}')
+        ..writeln(l10n.exportCountLabel(items.length))
         ..writeln();
       const divider = '────────────────────────────────────────';
       for (var i = 0; i < items.length; i++) {
@@ -433,17 +433,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         buffer
           ..writeln(divider)
           ..writeln('${i + 1}. ${it.source}')
-          ..writeln('   时间：${timeFmt.format(
+          ..writeln('   ${l10n.exportItemTimeLabel}: ${timeFmt.format(
             DateTime.fromMillisecondsSinceEpoch(it.timeMillis),
           )}');
         if (it.title?.isNotEmpty == true) {
-          buffer.writeln('   标题：${it.title}');
+          buffer.writeln('   ${l10n.exportItemTitleLabel}: ${it.title}');
         }
         if (it.content?.isNotEmpty == true) {
-          buffer.writeln('   内容：${it.content}');
+          buffer.writeln('   ${l10n.exportItemContentLabel}: ${it.content}');
         }
         if (it.note?.isNotEmpty == true) {
-          buffer.writeln('   备注：${it.note}');
+          buffer.writeln('   ${l10n.exportItemNoteLabel}: ${it.note}');
         }
       }
       buffer.writeln(divider);
@@ -452,7 +452,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       final exportDir = Directory('${dir.path}/export');
       await exportDir.create(recursive: true);
       final ts = DateFormat('yyyyMMdd_HHmm').format(now);
-      final file = File('${exportDir.path}/pinnit_history_$ts.txt');
+      final file = File('${exportDir.path}/dingpin_history_$ts.txt');
       await file.writeAsString(buffer.toString());
 
       if (share) {

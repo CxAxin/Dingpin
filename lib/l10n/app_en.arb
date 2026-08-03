@@ -71,7 +71,7 @@
     "description": "Prefix label before a user note on a history item"
   },
   "pinAction": "Top",
-  "unpinAction": "Untop",
+  "unpinAction": "Unpin",
   "language": "Language",
   "languageSystem": "Follow system",
   "languageChinese": "Chinese",
@@ -91,8 +91,22 @@
   "saveToLocal": "Save to device",
   "shareExport": "Share",
   "ownPinLabel": "Dingpin (created)",
-  "exportSavedLocal": "Saved to the Download/Pinnit folder",
+  "exportSavedLocal": "Saved to the Download/Dingpin folder",
   "exportEmptyRange": "No notifications in this range",
+  "exportHeader": "Dingpin notification history export",
+  "exportTimeLabel": "Export time",
+  "exportRangeLabel": "Range",
+  "exportCountLabel": "Total {count} items",
+  "@exportCountLabel": {
+    "description": "Header line showing how many notifications were exported",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "exportItemTimeLabel": "Time",
+  "exportItemTitleLabel": "Title",
+  "exportItemContentLabel": "Content",
+  "exportItemNoteLabel": "Note",
   "tabPinned": "My Pins",
   "tabHistory": "History",
   "tabAbout": "About"

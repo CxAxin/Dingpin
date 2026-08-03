@@ -71,10 +71,10 @@ class AboutScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                 ],
-                const ListTile(
-                  leading: Icon(Icons.code_outlined),
-                  title: Text('基于 Pinnit 开源项目'),
-                  subtitle: Text('Apache-2.0 许可 · 二次开发'),
+                ListTile(
+                  leading: const Icon(Icons.code_outlined),
+                  title: Text(l10n.basedOnPinnit),
+                  subtitle: Text(l10n.apacheLicense),
                 ),
               ],
             ),

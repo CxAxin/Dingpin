@@ -5,11 +5,12 @@
     <string name="pinned_channel_desc">固定到通知栏的通知</string>
     <string name="pinned_default_title">固定通知</string>
     <string name="action_copy">复制</string>
-    <string name="action_unpin">取消固定</string>
+    <string name="action_unpin">取消顶</string>
     <string name="service_channel_name">顶顶 后台服务</string>
     <string name="service_channel_desc">保持通知固定和监听服务运行</string>
     <string name="service_notification_title">顶顶 正在运行</string>
     <string name="service_notification_text">固定通知和通知历史监听服务保持活跃</string>
     <string name="clipboard_label">顶顶</string>
     <string name="copied_toast">已复制到剪贴板</string>
+    <string name="notification_listener_label">顶顶 通知读取</string>
 </resources>

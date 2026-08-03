@@ -12,4 +12,5 @@
     <string name="service_notification_text">Pinned notifications and history listener stay active</string>
     <string name="clipboard_label">Dingpin</string>
     <string name="copied_toast">Copied to clipboard</string>
+    <string name="notification_listener_label">Dingpin notification reader</string>
 </resources>

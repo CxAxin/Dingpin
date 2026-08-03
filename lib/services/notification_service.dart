@@ -9,7 +9,7 @@ import 'package:pinnit_flutter/services/pins_bridge.dart';
 
 /// Wraps [FlutterLocalNotificationsPlugin] for notification *permission*
 /// checks, and delegates *pinned* (ongoing) notifications to the native layer
-/// via [PinsBridge] so their action buttons ("复制" / "取消固定") work reliably
+/// via [PinsBridge] so their action buttons ("Copy" / "Unpin") work reliably
 /// from the notification shade (see [PinnitPins] / [PinnitActionReceiver]).
 class NotificationService {
   NotificationService._();

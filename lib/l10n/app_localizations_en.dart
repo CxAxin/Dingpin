@@ -186,7 +186,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pinAction => 'Top';
 
   @override
-  String get unpinAction => 'Untop';
+  String get unpinAction => 'Unpin';
 
   @override
   String get language => 'Language';
@@ -248,10 +248,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownPinLabel => 'Dingpin (created)';
 
   @override
-  String get exportSavedLocal => 'Saved to the Download/Pinnit folder';
+  String get exportSavedLocal => 'Saved to the Download/Dingpin folder';
 
   @override
   String get exportEmptyRange => 'No notifications in this range';
+
+  @override
+  String get exportHeader => 'Dingpin notification history export';
+
+  @override
+  String get exportTimeLabel => 'Export time';
+
+  @override
+  String get exportRangeLabel => 'Range';
+
+  @override
+  String exportCountLabel(int count) {
+    return 'Total $count items';
+  }
+
+  @override
+  String get exportItemTimeLabel => 'Time';
+
+  @override
+  String get exportItemTitleLabel => 'Title';
+
+  @override
+  String get exportItemContentLabel => 'Content';
+
+  @override
+  String get exportItemNoteLabel => 'Note';
 
   @override
   String get tabPinned => 'My Pins';

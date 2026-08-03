@@ -82,7 +82,8 @@ class PinnitApplication : Application() {
                     val uuid = args?.get("uuid") as? String ?: ""
                     val title = args?.get("title") as? String
                     val content = args?.get("content") as? String
-                    PinnitPins.show(applicationContext, uuid, title, content)
+                    val locale = args?.get("locale") as? String
+                    PinnitPins.show(applicationContext, uuid, title, content, locale)
                     result.success(null)
                 }
                 "cancelPinned" -> {
@@ -124,7 +125,7 @@ class PinnitApplication : Application() {
                 "saveFileToDownloads" -> {
                     val args = call.arguments as? Map<*, *>
                     val path = args?.get("path") as? String
-                    val name = args?.get("name") as? String ?: "pinnit_history.txt"
+                    val name = args?.get("name") as? String ?: "dingpin_history.txt"
                     if (path != null) {
                         val ok = saveFileToDownloads(path, name)
                         result.success(ok)
@@ -254,7 +255,7 @@ class PinnitApplication : Application() {
                 val values = ContentValues().apply {
                     put(MediaStore.Downloads.DISPLAY_NAME, displayName)
                     put(MediaStore.Downloads.MIME_TYPE, "text/plain")
-                    put(MediaStore.Downloads.RELATIVE_PATH, "Download/Pinnit")
+                    put(MediaStore.Downloads.RELATIVE_PATH, "Download/Dingpin")
                 }
                 val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
                     ?: return false

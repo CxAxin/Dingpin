@@ -17,7 +17,7 @@
 
     <application
         android:name=".PinnitApplication"
-        android:label="顶顶"
+        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -39,7 +39,7 @@
 
         <service
             android:name=".PinnitNotificationListenerService"
-            android:label="顶顶 通知读取"
+            android:label="@string/notification_listener_label"
             android:exported="false"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
@@ -58,7 +58,7 @@
                 android:value="running_notification_listener_and_maintaining_pinned_notifications" />
         </service>
 
-        <!-- Receives "复制" / "取消固定" taps from pinned notification actions. -->
+        <!-- Receives "Copy" / "Unpin" taps from pinned notification actions. -->
         <receiver
             android:name=".PinnitActionReceiver"
             android:exported="false" />

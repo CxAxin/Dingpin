@@ -84,7 +84,8 @@ class _PinnitAppState extends ConsumerState<PinnitApp> with WidgetsBindingObserv
     final localeOverride = ref.watch(localeOverrideProvider);
 
     return MaterialApp(
-      title: '顶顶',
+      onGenerateTitle: (context) =>
+          AppLocalizations.of(context)?.appTitle ?? 'Dingpin',
       debugShowCheckedModeBanner: false,
       // `null` lets Flutter follow the system locale; a non-null value is the
       // user's manual override (set from the About screen, persisted).

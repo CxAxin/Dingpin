@@ -1,8 +1,11 @@
 // Pinnit (Flutter port) — derivative work of Pinnit (https://github.com/msasikanth/pinnit).
 // Original © 2020 Sasikanth Miriyampalli, Apache-2.0. Modified. See LICENSE and NOTICE.
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:pinnit_flutter/data/app_database.dart';
 import 'package:pinnit_flutter/data/notification_model.dart';
@@ -18,7 +21,7 @@ const _kPinsChannel = 'pinnit/pins';
 /// * Dart → native: [showPinned] / [cancelPinned] post or remove the system
 ///   notification. The native side owns the action buttons, so the taps are
 ///   always delivered (unlike the Flutter plugin's background callback).
-/// * native → Dart: `unpin` (user tapped "取消固定" in the shade) and
+/// * native → Dart: `unpin` (user tapped the unpin action in the shade) and
 ///   `openEditor` (user tapped the notification body) are handled here.
 class PinsBridge {
   PinsBridge._() {
@@ -49,11 +52,34 @@ class PinsBridge {
   }
 
   Future<void> showPinned(PinnitNotification n) async {
+    final locale = await _effectiveLocale();
     await _channel.invokeMethod('showPinned', {
       'uuid': n.uuid,
       'title': n.title,
       'content': n.content,
+      'locale': locale,
     });
+  }
+
+  /// Returns the language code that native notification resources should use.
+  ///
+  /// Respects the in-app language override first, then falls back to the
+  /// Flutter platform locale (which follows the system when no override is set).
+  /// Defaults to 'en' for any unsupported language so buttons never disappear.
+  Future<String> _effectiveLocale() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final pref = prefs.getString(kLocalePrefKey) ?? 'system';
+      String code;
+      if (pref == 'system') {
+        code = PlatformDispatcher.instance.locale.languageCode;
+      } else {
+        code = pref;
+      }
+      return code == 'zh' ? 'zh' : 'en';
+    } catch (_) {
+      return 'en';
+    }
   }
 
   Future<void> cancelPinned(String uuid) async {
