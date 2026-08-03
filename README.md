@@ -1,5 +1,7 @@
 # Dingpin (顶顶)
 
+> 📘 中文文档：[README.zh-CN.md](README.zh-CN.md)
+
 **Dingpin** (顶顶) is an open-source Android app that lets you **pin notes & notifications to your notification panel** so important info never gets lost in the flood.
 
 > Dingpin is a modified version of the open-source [Pinnit](https://github.com/msasikanth/pinnit) project by Sasikanth Miriyampalli, used under the Apache License 2.0. The original Pinnit (Kotlin) is archived; Dingpin is a Flutter/Dart reimplementation that keeps the core "pin to notification shade" idea and adds notification-history capture and more. Attribution and modification notices are in [`NOTICE`](NOTICE); the full license text is in [`LICENSE`](LICENSE).
