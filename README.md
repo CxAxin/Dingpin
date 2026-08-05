@@ -33,6 +33,16 @@
 
 ---
 
+## Screenshots
+
+| Pinned list | Persistent in the shade | Editor | Notification history |
+|-------------|-------------------------|--------|----------------------|
+| ![Pinned list](screenshots/how-to-pin-list.png) | ![In the shade](screenshots/how-to-pin-shade.png) | ![Editor](screenshots/how-to-pin-editor.png) | ![History](screenshots/recover-history-list.png) |
+
+> Screenshots show Dingpin running on Android. Dingpin is a modified version of [Pinnit](https://github.com/msasikanth/pinnit) (Apache-2.0) — see [License & attribution](#license--attribution).
+
+---
+
 ## Getting started
 
 ### Prerequisites
