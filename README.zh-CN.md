@@ -1,5 +1,7 @@
 # 顶顶（Dingpin）
 
+[![Version](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-2.6.7%20%28build%20267%29-brightgreen)](https://github.com/CxAxin/Dingpin/releases)
+
 **顶顶**（Dingpin）是一款开源的安卓 App，可以**把笔记和通知「钉」在通知栏最上面**，让重要信息不再淹没在通知洪流里。
 
 > 顶顶是基于开源项目 [Pinnit](https://github.com/msasikanth/pinnit)（作者 Sasikanth Miriyampalli，Apache-2.0 协议）二次开发的版本。原版 Pinnit（Kotlin）已归档；顶顶用 Flutter/Dart 重写，保留了「钉到通知栏」的核心思路，并新增了通知历史捕获等功能。署名与修改声明见 [`NOTICE`](NOTICE)，完整许可证见 [`LICENSE`](LICENSE)。
