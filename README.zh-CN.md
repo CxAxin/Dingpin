@@ -27,6 +27,8 @@
 
 ## 下载
 
+> 当前版本：**v2.6.7**（build 267）· 需 Android 8.0+
+
 - 官方网站：**https://dingpin.app**
 - 最新版 APK（arm64）：[百度网盘](https://pan.baidu.com/s/1JdR7dcFpXkfz_7w1TgnydA?pwd=csax)
 - 通用版 APK（全架构）：[百度网盘](https://pan.baidu.com/s/1Gg2oYybI5WrUrmZ3LgdZsw?pwd=csax)

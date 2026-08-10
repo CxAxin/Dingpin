@@ -27,6 +27,8 @@
 
 ## Download
 
+> Current release: **v2.6.7** (build 267) · requires Android 8.0+
+
 - Official site: **https://dingpin.app**
 - Latest APK (arm64): [Baidu Netdisk](https://pan.baidu.com/s/1JdR7dcFpXkfz_7w1TgnydA?pwd=csax)
 - Universal APK (all architectures): [Baidu Netdisk](https://pan.baidu.com/s/1Gg2oYybI5WrUrmZ3LgdZsw?pwd=csax)
