@@ -2,7 +2,7 @@
 
 > 📘 中文文档：[README.zh-CN.md](README.zh-CN.md)
 
-[![Version](https://img.shields.io/badge/version-2.6.7%20%28build%20267%29-brightgreen)](https://github.com/CxAxin/Dingpin/releases)
+[![Version](https://img.shields.io/badge/version-2.6.7%20%28build%20267%29-brightgreen)](https://github.com/CxAxin/Dingpin/releases) [![Platform](https://img.shields.io/badge/platform-Android-3DDC84)](https://www.android.com) [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
 **Dingpin** (顶顶) is an open-source Android app that lets you **pin notes & notifications to your notification panel** so important info never gets lost in the flood.
 
