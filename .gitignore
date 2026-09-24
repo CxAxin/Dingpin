@@ -36,3 +36,12 @@ vendor/
 # CMake / NDK build cache
 /android/app/.cxx/
 
+# Local scratch / diagnostic scripts (not source — keep out of Git)
+*.bak
+diag_*.sh
+probe_deps.*
+prewarm_assemble.sh
+run_tests.sh
+build_debug.sh
+build_28[2-9].sh
+

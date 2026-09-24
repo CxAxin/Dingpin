@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import 'package:pinnit_flutter/data/app_database.dart';
 import 'package:pinnit_flutter/data/third_party_notification.dart';
+import 'package:pinnit_flutter/services/blocklist_service.dart';
 import 'package:pinnit_flutter/services/notification_service.dart';
 
 /// MethodChannel name — must match the Kotlin side
@@ -40,6 +41,46 @@ class NotificationListenerBridge {
   /// Emits every captured third-party notification right after it is persisted.
   Stream<ThirdPartyNotification> get captured => _controller.stream;
 
+  /// How long a captured notification "owns" its content key for the purpose
+  /// of swallowing a duplicate delivery (see [_isBurstDuplicate]).
+  static const int _burstWindowMs = 1500;
+
+  /// Recently captured content keys -> the millis timestamp we saw them at.
+  ///
+  /// Only ever holds a second or two worth of notifications, and stale entries
+  /// are pruned on every call, so it stays tiny.
+  final Map<String, int> _recentKeys = <String, int>{};
+
+  /// Whether this notification is a *re-delivery* of one we just recorded.
+  ///
+  /// Apps routinely post a notification and then immediately update it, which
+  /// makes the system fire `onNotificationPosted` twice in a row for what the
+  /// user sees as ONE notification. `AppDatabase.upsertThirdParty` is designed
+  /// to merge such a pair, but two callbacks are delivered back-to-back on the
+  /// same event loop, so both used to slip past the "already exists?" check and
+  /// insert — every notification therefore showed up twice in the history.
+  ///
+  /// This check runs *synchronously* (there is no `await` above it in
+  /// [_onNativeCall]), so the second delivery can never race the first one.
+  ///
+  /// Content is compared whitespace-normalised: a re-delivery that differs
+  /// only by a stray newline/space is still the same notification. Genuinely
+  /// different text — even a single changed digit — passes through untouched.
+  bool _isBurstDuplicate(ThirdPartyNotification n) {
+    String norm(String? s) =>
+        (s ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
+    final key = '${n.packageName}\u0000${norm(n.title)}\u0000${norm(n.content)}';
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    _recentKeys.removeWhere((_, ts) => now - ts > _burstWindowMs);
+
+    final seenAt = _recentKeys[key];
+    if (seenAt != null && now - seenAt <= _burstWindowMs) return true;
+
+    _recentKeys[key] = now;
+    return false;
+  }
+
   Future<void> _onNativeCall(MethodCall call) async {
     switch (call.method) {
       case 'onNotificationPosted':
@@ -56,8 +97,32 @@ class NotificationListenerBridge {
               DateTime.now().millisecondsSinceEpoch,
         );
 
-        await AppDatabase.upsertThirdParty(n);
-        _controller.add(n);
+        // Drop blocked notifications before they touch the DB or the UI:
+        // the blocklist is user-managed (e.g. "正在扫描", "正在获取") and these
+        // status notifications re-fire constantly — recording them just bloats
+        // the table and clutters the history list.
+        if (BlocklistService.instance.isBlocked(
+          title: n.title,
+          content: n.content,
+          appName: n.appName,
+        )) {
+          return;
+        }
+
+        // Swallow the "post + immediate update" double delivery before it can
+        // reach the DB. See [_isBurstDuplicate].
+        if (_isBurstDuplicate(n)) {
+          return;
+        }
+
+        final created = await AppDatabase.upsertThirdParty(n);
+        // Only surface genuinely-new notifications on the stream: when the
+        // upsert merged into an existing row (exact or fuzzy duplicate), the
+        // in-memory list already contains that item — emitting it here would
+        // insert a ghost duplicate into the UI.
+        if (created) {
+          _controller.add(n);
+        }
 
       case 'onOwnNotificationRemoved':
         // The user (or a launcher/OEM) swiped away one of our own pinned

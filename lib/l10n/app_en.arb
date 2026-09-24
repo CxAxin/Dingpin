@@ -30,6 +30,8 @@
   "copiedToClipboard": "Copied to clipboard",
   "copy": "Copy",
   "delete": "Delete",
+  "deleteUndo": "Notification deleted",
+  "undo": "Undo",
   "searchHistoryHint": "Search history…",
   "historyTitle": "Notification history",
   "clearHistoryTitle": "Clear history?",
@@ -109,5 +111,28 @@
   "exportItemNoteLabel": "Note",
   "tabPinned": "My Pins",
   "tabHistory": "History",
-  "tabAbout": "About"
+  "tabAbout": "About",
+  "blocklist": "Blocklist",
+  "blocklistTitle": "Blocklist",
+  "blocklistHint": "Notifications whose title or content contains these words won't be recorded. One word per line.",
+  "blocklistAdd": "Add",
+  "blocklistAddHint": "Enter a keyword to block",
+  "blocklistEmpty": "No blocklist words yet",
+  "blockedCount": "Blocked {count} items",
+  "@blockedCount": {
+    "description": "Shows how many notifications have been blocked",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "groupByApp": "Group by app",
+  "groupedAppCount": "{count} items",
+  "@groupedAppCount": {
+    "description": "Notification count under an app group",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "exportSaveHint": "Save as a txt file",
+  "exportShareHint": "Send to another app"
 }

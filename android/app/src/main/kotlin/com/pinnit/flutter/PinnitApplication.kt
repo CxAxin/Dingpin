@@ -46,6 +46,27 @@ class PinnitApplication : Application() {
         /// ([PinnitPins] / [PinnitActionReceiver]) from Dart and back.
         lateinit var pinsChannel: MethodChannel
             private set
+
+        /// Ask Dart to open a blank editor **right now**, before any Activity
+        /// is launched.
+        ///
+        /// The engine is pre-warmed here and keeps running while the app is in
+        /// the background, so the Quick Settings tile can push the editor onto
+        /// the Navigator while the notification shade is still collapsing. When
+        /// the Activity renders its first frame, the editor is already on top —
+        /// the user never sees the home screen flash by.
+        ///
+        /// Returns `false` when Dart wasn't reachable (engine not up yet); the
+        /// caller then falls back to the plain intent route.
+        fun notifyNewEditor(): Boolean {
+            if (!::pinsChannel.isInitialized) return false
+            return try {
+                pinsChannel.invokeMethod("prepareNewEditor", null)
+                true
+            } catch (e: Exception) {
+                false
+            }
+        }
     }
 
     override fun onCreate() {

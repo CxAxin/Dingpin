@@ -76,6 +76,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete => 'Delete';
 
   @override
+  String get deleteUndo => 'Notification deleted';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
   String get searchHistoryHint => 'Search history…';
 
   @override
@@ -287,4 +293,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tabAbout => 'About';
+
+  @override
+  String get blocklist => 'Blocklist';
+
+  @override
+  String get blocklistTitle => 'Blocklist';
+
+  @override
+  String get blocklistHint =>
+      'Notifications whose title or content contains these words won\'t be recorded. One word per line.';
+
+  @override
+  String get blocklistAdd => 'Add';
+
+  @override
+  String get blocklistAddHint => 'Enter a keyword to block';
+
+  @override
+  String get blocklistEmpty => 'No blocklist words yet';
+
+  @override
+  String blockedCount(int count) {
+    return 'Blocked $count items';
+  }
+
+  @override
+  String get groupByApp => 'Group by app';
+
+  @override
+  String groupedAppCount(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get exportSaveHint => 'Save as a txt file';
+
+  @override
+  String get exportShareHint => 'Send to another app';
 }

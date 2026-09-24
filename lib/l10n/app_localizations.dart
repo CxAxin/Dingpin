@@ -224,6 +224,18 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
+  /// No description provided for @deleteUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification deleted'**
+  String get deleteUndo;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
   /// No description provided for @searchHistoryHint.
   ///
   /// In en, this message translates to:
@@ -613,6 +625,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About'**
   String get tabAbout;
+
+  /// No description provided for @blocklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocklist'**
+  String get blocklist;
+
+  /// No description provided for @blocklistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocklist'**
+  String get blocklistTitle;
+
+  /// No description provided for @blocklistHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications whose title or content contains these words won\'t be recorded. One word per line.'**
+  String get blocklistHint;
+
+  /// No description provided for @blocklistAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get blocklistAdd;
+
+  /// No description provided for @blocklistAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a keyword to block'**
+  String get blocklistAddHint;
+
+  /// No description provided for @blocklistEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No blocklist words yet'**
+  String get blocklistEmpty;
+
+  /// Shows how many notifications have been blocked
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked {count} items'**
+  String blockedCount(int count);
+
+  /// No description provided for @groupByApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Group by app'**
+  String get groupByApp;
+
+  /// Notification count under an app group
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String groupedAppCount(int count);
+
+  /// No description provided for @exportSaveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as a txt file'**
+  String get exportSaveHint;
+
+  /// No description provided for @exportShareHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to another app'**
+  String get exportShareHint;
 }
 
 class _AppLocalizationsDelegate

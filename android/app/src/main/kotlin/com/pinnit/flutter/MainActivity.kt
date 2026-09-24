@@ -30,17 +30,39 @@ class MainActivity : FlutterActivity() {
         handleIntent(intent)
     }
 
-    /// When the user taps a pinned notification's body, the native
-    /// [PinnitPins] content intent carries the note's `uuid` here. Forward it
-    /// to Dart so the editor opens for that note.
+    /// Two launch routes reach this point:
+    ///  * the Quick Settings tile carries `new_note` — open a blank editor;
+    ///  * a pinned notification's content intent carries `uuid` — open the
+    ///    editor for that note.
     private fun handleIntent(intent: Intent?) {
-        val uuid = intent?.getStringExtra("uuid") ?: return
+        if (intent == null) return
+        if (intent.getBooleanExtra("new_note", false)) {
+            invokeOnChannel("openNewEditor", null)
+            return
+        }
+        val uuid = intent.getStringExtra("uuid") ?: return
+        invokeOnChannel("openEditor", uuid)
+    }
+
+    /// Forward a launch request to Dart over the pins channel.
+    ///
+    /// No artificial delay here on purpose. Previously this waited 400 ms,
+    /// which meant the home screen was on screen for ~400 ms before the editor
+    /// slid in — the "flash of the main screen" the tile launch used to have.
+    /// The Dart side now retries on its own if the Navigator isn't attached
+    /// yet, and the tile pre-pushes the route before the Activity even starts.
+    private fun invokeOnChannel(method: String, arg: String?) {
         val engine = FlutterEngineCache.getInstance().get(PinnitApplication.FLUTTER_ENGINE_ID)
             ?: return
         val channel = MethodChannel(engine.dartExecutor.binaryMessenger, PinnitApplication.PINS_CHANNEL)
-        // Give the Flutter UI a moment to attach its Navigator before pushing.
-        Handler(Looper.getMainLooper()).postDelayed({
-            channel.invokeMethod("openEditor", uuid)
-        }, 400)
+        // Send immediately (so the editor is on screen before the first frame)
+        // and re-send a couple of times afterwards. On a cold start the Dart
+        // handler may not be registered yet and a dropped call would silently
+        // open nothing. Duplicates are safe — the Dart side de-dupes by time
+        // window and by uuid.
+        val handler = Handler(Looper.getMainLooper())
+        for (delay in longArrayOf(0, 150, 400)) {
+            handler.postDelayed({ channel.invokeMethod(method, arg) }, delay)
+        }
     }
 }

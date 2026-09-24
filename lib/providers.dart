@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 export 'package:pinnit_flutter/repositories/third_party_repository.dart'
-    show thirdPartyProvider;
+    show thirdPartyProvider, HistoryState, ThirdPartyNotifier;
 
 /// Global theme-mode toggle (system / light / dark).
 ///
@@ -39,3 +39,10 @@ String localePreferenceValue(Locale? locale) {
 /// Global [ProviderContainer] so non-widget singletons (e.g. [PinsBridge])
 /// can refresh providers in response to system / notification events.
 late ProviderContainer appContainer;
+
+/// True while a swipe-delete undo banner is on screen.
+///
+/// The banner sits just above the glass tab bar, which is exactly where the
+/// "new pin" FAB floats, so [MainScreen] tucks the FAB away for the few
+/// seconds the banner is visible instead of letting them overlap.
+final undoBannerVisibleProvider = StateProvider<bool>((ref) => false);

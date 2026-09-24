@@ -16,28 +16,39 @@ final notificationsProvider =
 );
 
 class NotificationsNotifier extends Notifier<List<PinnitNotification>> {
+  /// Guards `state =` after dispose (async work can finish late).
+  bool _disposed = false;
+
   @override
   List<PinnitNotification> build() {
+    _disposed = false;
     // Kick off the initial load; state updates when it completes.
     _load();
+    ref.onDispose(() => _disposed = true);
     return const [];
   }
 
   Future<void> _load() async {
-    state = await AppDatabase.notifications();
+    final rows = await AppDatabase.notifications();
+    if (_disposed) return;
+    state = rows;
   }
 
   Future<void> refresh() => _load();
 
   /// Insert or update a notification and reflect the change in the shade.
+  ///
+  /// The in-memory list is patched in place (_upsertLocal) instead of being
+  /// re-queried, so saving stays responsive even while the notification
+  /// listener is busy writing history rows.
   Future<void> save(PinnitNotification n) async {
     await AppDatabase.save(n);
+    _upsertLocal(n);
     if (n.isPinned) {
       await NotificationService.instance.showPinned(n);
     } else {
       await NotificationService.instance.cancelPinned(n.uuid);
     }
-    await _load();
   }
 
   Future<void> togglePin(PinnitNotification n) => save(n.copyWith(isPinned: !n.isPinned));
@@ -46,7 +57,32 @@ class NotificationsNotifier extends Notifier<List<PinnitNotification>> {
   Future<void> delete(PinnitNotification n) async {
     await AppDatabase.softDelete(n.uuid);
     await NotificationService.instance.cancelPinned(n.uuid);
-    await _load();
+    if (_disposed) return;
+    state = state.where((e) => e.uuid != n.uuid).toList();
+  }
+
+  /// Undo a delete — restore a notification that was dismissed
+  /// accidentally (via the SnackBar "撤销" action).
+  Future<void> restore(PinnitNotification n) async {
+    await AppDatabase.undelete(n.uuid);
+    if (n.isPinned) {
+      await NotificationService.instance.showPinned(n);
+    }
+    if (_disposed) return;
+    _upsertLocal(n);
+  }
+
+  /// Keep `state` in the same order as the DB query: pinned first, then
+  /// most-recently updated.
+  void _upsertLocal(PinnitNotification n) {
+    if (_disposed) return;
+    final next = state.where((e) => e.uuid != n.uuid).toList()..add(n);
+    next.sort((a, b) {
+      final pin = (b.isPinned ? 1 : 0).compareTo(a.isPinned ? 1 : 0);
+      if (pin != 0) return pin;
+      return b.updatedAt.compareTo(a.updatedAt);
+    });
+    state = next;
   }
 
   /// Re-post every pinned notification to the shade (e.g. after reboot).

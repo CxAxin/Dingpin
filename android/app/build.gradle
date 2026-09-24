@@ -23,7 +23,11 @@ if (flutterVersionName == null) {
 android {
     namespace "com.pinnit.flutter"
     compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    // Only NDK 28.2 is a complete install in the hand-assembled SDK used here
+    // (the 26.3/27.0 folders beside it are partial extractions with no
+    // source.properties). path_provider_android -> jni ships CMake native
+    // sources, so a working NDK is genuinely required.
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17

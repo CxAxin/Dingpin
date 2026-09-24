@@ -21,6 +21,8 @@
   "copiedToClipboard": "已复制到剪贴板",
   "copy": "复制",
   "delete": "删除",
+  "deleteUndo": "已删除通知",
+  "undo": "撤销",
   "searchHistoryHint": "搜索通知历史…",
   "historyTitle": "通知历史",
   "clearHistoryTitle": "清空历史？",
@@ -91,5 +93,28 @@
   "exportItemNoteLabel": "备注",
   "tabPinned": "自建",
   "tabHistory": "历史",
-  "tabAbout": "我的"
+  "tabAbout": "我的",
+  "blocklist": "屏蔽词",
+  "blocklistTitle": "屏蔽词管理",
+  "blocklistHint": "标题或内容包含这些词的通知不会被记录到历史中。每行一个词。",
+  "blocklistAdd": "添加",
+  "blocklistAddHint": "输入要屏蔽的关键词",
+  "blocklistEmpty": "还没有屏蔽词",
+  "blockedCount": "已屏蔽 {count} 条",
+  "@blockedCount": {
+    "description": "显示已屏蔽的通知数量",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "groupByApp": "按应用分组",
+  "groupedAppCount": "{count} 条",
+  "@groupedAppCount": {
+    "description": "分组下某应用的通知数量",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "exportSaveHint": "存为 txt 到下载目录",
+  "exportShareHint": "发送到其他应用"
 }

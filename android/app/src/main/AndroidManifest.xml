@@ -58,6 +58,19 @@
                 android:value="running_notification_listener_and_maintaining_pinned_notifications" />
         </service>
 
+        <!-- Quick Settings tile: tap in the shade to jump straight into the
+             "new pinned note" editor. -->
+        <service
+            android:name=".NewNoteTileService"
+            android:label="@string/tile_new_note"
+            android:icon="@drawable/ic_tile_new_note"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- Receives "Copy" / "Unpin" taps from pinned notification actions. -->
         <receiver
             android:name=".PinnitActionReceiver"

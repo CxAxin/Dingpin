@@ -13,6 +13,7 @@ import 'package:pinnit_flutter/editor/editor_screen.dart';
 import 'package:pinnit_flutter/providers.dart';
 import 'package:pinnit_flutter/repositories/notifications_repository.dart';
 import 'package:pinnit_flutter/utils/navigator_key.dart';
+import 'package:pinnit_flutter/widgets/app_page_route.dart';
 
 const _kPinsChannel = 'pinnit/pins';
 
@@ -48,6 +49,16 @@ class PinsBridge {
       case 'openEditor':
         final uuid = call.arguments as String?;
         if (uuid != null) _openEditor(uuid);
+      case 'openNewEditor':
+        // Launch route from the Quick Settings tile ("new pinned note").
+        _openNewEditor();
+      case 'prepareNewEditor':
+        // Quick Settings tile, sent *before* the Activity is launched (see
+        // NewNoteTileService): the engine is already running in the background,
+        // so the editor can be pushed while the shade is still collapsing.
+        // By the time MainActivity renders its first frame the editor is
+        // already on top — no flash of the home screen in between.
+        _openNewEditor();
     }
   }
 
@@ -61,12 +72,22 @@ class PinsBridge {
     });
   }
 
+  /// Cached because [showPinned] runs on the save path — hitting
+  /// SharedPreferences on every save added avoidable work to the hot path.
+  /// Cleared by [invalidateLocale] when the user switches language.
+  String? _cachedLocale;
+
+  /// Drop the cached locale (call after a language change).
+  void invalidateLocale() => _cachedLocale = null;
+
   /// Returns the language code that native notification resources should use.
   ///
   /// Respects the in-app language override first, then falls back to the
   /// Flutter platform locale (which follows the system when no override is set).
   /// Defaults to 'en' for any unsupported language so buttons never disappear.
   Future<String> _effectiveLocale() async {
+    final cached = _cachedLocale;
+    if (cached != null) return cached;
     try {
       final prefs = await SharedPreferences.getInstance();
       final pref = prefs.getString(kLocalePrefKey) ?? 'system';
@@ -76,7 +97,9 @@ class PinsBridge {
       } else {
         code = pref;
       }
-      return code == 'zh' ? 'zh' : 'en';
+      final result = code == 'zh' ? 'zh' : 'en';
+      _cachedLocale = result;
+      return result;
     } catch (_) {
       return 'en';
     }
@@ -86,13 +109,73 @@ class PinsBridge {
     await _channel.invokeMethod('cancelPinned', uuid);
   }
 
+  /// 同一波启动只认一次。
+  ///
+  /// 磁贴会连发两次：一次是 `prepareNewEditor`（Activity 拉起之前），一次是
+  /// Activity 起来后带的 `new_note` extra。没有这个窗就会压进两个编辑页。
+  DateTime? _lastNewEditorAt;
+  int _retries = 0;
+
+  /// 页面是不是已经在用户眼前。
+  ///
+  /// 决定了跳转用不用动画：app 已经在前台 → 给一段正常的入场动画；
+  /// 还在后台（磁贴 / 通知冷启动）→ 直接把页面放好，不让用户看到主界面
+  /// 闪一下再跳走。
+  bool get _isResumed =>
+      WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+
+  /// 上一次打开的是哪条通知（配合 [_lastEditorAt] 做去重：MainActivity 会
+  /// 重复投递几次，见 invokeOnChannel）。
+  String? _lastEditorUuid;
+  DateTime? _lastEditorAt;
+
   void _openEditor(String uuid) {
+    final now = DateTime.now();
+    final last = _lastEditorAt;
+    if (_lastEditorUuid == uuid &&
+        last != null &&
+        now.difference(last) < const Duration(seconds: 2)) {
+      return; // 同一波投递，忽略。
+    }
     final state = navigatorKey.currentState;
     if (state != null) {
-      state.push(MaterialPageRoute(builder: (_) => EditorScreen(uuid: uuid)));
-    } else {
-      // UI not mounted yet (cold start via body tap) — retry shortly.
-      Future.delayed(const Duration(milliseconds: 400), () => _openEditor(uuid));
+      _retries = 0;
+      _lastEditorUuid = uuid;
+      _lastEditorAt = now;
+      state.push(
+        AppPageRoute(
+          builder: (_) => EditorScreen(uuid: uuid),
+          instant: !_isResumed,
+        ),
+      );
+    } else if (_retries < 40) {
+      // UI not mounted yet (cold start via body tap) — retry at a short
+      // interval so the editor lands as early as possible.
+      _retries++;
+      Future.delayed(const Duration(milliseconds: 50), () => _openEditor(uuid));
+    }
+  }
+
+  /// Quick Settings tile launch: a blank editor (new note).
+  void _openNewEditor() {
+    final now = DateTime.now();
+    final last = _lastNewEditorAt;
+    if (last != null && now.difference(last) < const Duration(seconds: 2)) {
+      return; // 同一波启动，已经压过了。
+    }
+    final state = navigatorKey.currentState;
+    if (state != null) {
+      _retries = 0;
+      _lastNewEditorAt = now;
+      state.push(
+        AppPageRoute(
+          builder: (_) => const EditorScreen(),
+          instant: !_isResumed,
+        ),
+      );
+    } else if (_retries < 40) {
+      _retries++;
+      Future.delayed(const Duration(milliseconds: 50), _openNewEditor);
     }
   }
 }

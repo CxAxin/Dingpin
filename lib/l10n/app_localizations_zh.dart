@@ -75,6 +75,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get delete => '删除';
 
   @override
+  String get deleteUndo => '已删除通知';
+
+  @override
+  String get undo => '撤销';
+
+  @override
   String get searchHistoryHint => '搜索通知历史…';
 
   @override
@@ -280,4 +286,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tabAbout => '我的';
+
+  @override
+  String get blocklist => '屏蔽词';
+
+  @override
+  String get blocklistTitle => '屏蔽词管理';
+
+  @override
+  String get blocklistHint => '标题或内容包含这些词的通知不会被记录到历史中。每行一个词。';
+
+  @override
+  String get blocklistAdd => '添加';
+
+  @override
+  String get blocklistAddHint => '输入要屏蔽的关键词';
+
+  @override
+  String get blocklistEmpty => '还没有屏蔽词';
+
+  @override
+  String blockedCount(int count) {
+    return '已屏蔽 $count 条';
+  }
+
+  @override
+  String get groupByApp => '按应用分组';
+
+  @override
+  String groupedAppCount(int count) {
+    return '$count 条';
+  }
+
+  @override
+  String get exportSaveHint => '存为 txt 到下载目录';
+
+  @override
+  String get exportShareHint => '发送到其他应用';
 }

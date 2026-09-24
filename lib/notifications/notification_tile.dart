@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:pinnit_flutter/data/notification_model.dart';
 import 'package:pinnit_flutter/l10n/app_localizations.dart';
+import 'package:pinnit_flutter/widgets/app_menu.dart';
 
 /// A single row in the notification list showing the title, optional content,
 /// and a pin toggle that mirrors Pinnit's "pinned first" ordering.
@@ -10,17 +10,24 @@ class NotificationTile extends StatelessWidget {
   const NotificationTile({
     super.key,
     required this.notification,
-    required this.onTap,
-    required this.onTogglePin,
-    required this.onDelete,
-    required this.onCopy,
+    this.onTap,
+    this.onTogglePin,
+    this.onDelete,
+    this.onCopy,
+    this.interactive = true,
   });
 
   final PinnitNotification notification;
-  final VoidCallback onTap;
-  final VoidCallback onTogglePin;
-  final VoidCallback onDelete;
-  final VoidCallback onCopy;
+
+  /// 四个回调都可以留空：正在离场的那一行（见 AppAnimatedList 的
+  /// removedItemBuilder）不该再响应点击和长按。
+  final VoidCallback? onTap;
+  final VoidCallback? onTogglePin;
+  final VoidCallback? onDelete;
+  final VoidCallback? onCopy;
+
+  /// `false` 时这一行纯粹是张"画"，不带任何交互——用于正在收起的离场副本。
+  final bool interactive;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +35,8 @@ class NotificationTile extends StatelessWidget {
     final theme = Theme.of(context);
     return ListTile(
       onTap: onTap,
-      onLongPress: () => _showContextMenu(context),
+      // 长按菜单的震动由 ListTile 内部的 InkWell 自动触发，不用再调一次。
+      onLongPress: interactive ? () => _showContextMenu(context) : null,
       leading: IconButton(
         tooltip: notification.isPinned ? l10n.unpinAction : l10n.pinAction,
         icon: Icon(
@@ -55,52 +63,28 @@ class NotificationTile extends StatelessWidget {
 
   void _showContextMenu(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final RenderBox tile = context.findRenderObject()! as RenderBox;
-    final offset = tile.localToGlobal(Offset.zero);
-    final size = tile.size;
-    showMenu<String>(
+    // 走 AppMenu 的快速菜单（150ms 淡入 + 缩放），与历史页同一套外观和手感。
+    // 震动由 ListTile 内部的 InkWell 自动触发，这里不用再调一次。
+    AppMenu.show(
       context: context,
-      position: RelativeRect.fromLTRB(
-        offset.dx + size.width / 2,
-        offset.dy + size.height / 2,
-        offset.dx + size.width / 2,
-        offset.dy + size.height / 2,
-      ),
       items: [
-        PopupMenuItem(
-          value: 'copy',
-          onTap: () {
-            onCopy();
-            final text = [notification.title, notification.content]
-                .whereType<String>()
-                .join('\n');
-            Clipboard.setData(ClipboardData(text: text));
-          },
-          child: ListTile(
-            leading: const Icon(Icons.copy),
-            title: Text(l10n.copy),
-            contentPadding: EdgeInsets.zero,
-          ),
-        ),
-        PopupMenuItem(
-          value: 'toggle_pin',
+        AppMenuEntry(
+          icon: notification.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+          label: notification.isPinned ? l10n.unpinAction : l10n.pinAction,
           onTap: onTogglePin,
-          child: ListTile(
-            leading: Icon(
-              notification.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-            ),
-            title: Text(notification.isPinned ? l10n.unpinAction : l10n.pinAction),
-            contentPadding: EdgeInsets.zero,
-          ),
         ),
-        PopupMenuItem(
-          value: 'delete',
+        AppMenuEntry(
+          icon: Icons.copy_outlined,
+          label: l10n.copy,
+          // 复制这件事统一在调用方做（含 SnackBar 提示）。这里再写一份会
+          // 写两次剪贴板。
+          onTap: onCopy,
+        ),
+        AppMenuEntry(
+          icon: Icons.delete_outline,
+          label: l10n.delete,
+          isDanger: true,
           onTap: onDelete,
-          child: ListTile(
-            leading: const Icon(Icons.delete, color: Colors.red),
-            title: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
-            contentPadding: EdgeInsets.zero,
-          ),
         ),
       ],
     );

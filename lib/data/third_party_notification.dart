@@ -33,9 +33,12 @@ class ThirdPartyNotification {
   })  : uuid = uuid ?? const Uuid().v4(),
         createdAt = createdAt ?? DateTime.now().millisecondsSinceEpoch;
 
+  /// [clearNote] exists because a plain `note: null` can't be told apart from
+  /// "leave it alone" — pass it to remove an existing note.
   ThirdPartyNotification copyWith({
     String? note,
     int? postedAt,
+    bool clearNote = false,
   }) {
     return ThirdPartyNotification(
       uuid: uuid,
@@ -44,7 +47,7 @@ class ThirdPartyNotification {
       title: title,
       content: content,
       postedAt: postedAt ?? this.postedAt,
-      note: note ?? this.note,
+      note: clearNote ? null : (note ?? this.note),
       createdAt: createdAt,
     );
   }
