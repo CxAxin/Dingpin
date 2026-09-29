@@ -4,3 +4,18 @@ allprojects {
         maven { url 'https://maven.aliyun.com/repository/public' }
     }
 }
+
+// The hand-assembled SDK under %TEMP% ships a broken build-tools/34.0.0:
+// it is a partial extraction with no aapt2/zipalign and most of lib/ missing,
+// so AGP aborts every module with
+//   "Installed Build Tools revision 34.0.0 is corrupted."
+// build-tools/35.0.0 in the same SDK IS complete. AGP's default would still
+// pick the broken 34.0.0 for each plugin subproject (flutter_local_notifications
+// etc.), so pin it across the whole build rather than only in app/build.gradle.
+subprojects {
+    afterEvaluate { p ->
+        if (p.extensions.findByName('android') != null) {
+            p.android.buildToolsVersion = '35.0.0'
+        }
+    }
+}

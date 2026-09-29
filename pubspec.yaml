@@ -1,7 +1,7 @@
 name: pinnit_flutter
 description: A Flutter reimplementation of Pinnit - pin notes & notifications to your notification panel.
 publish_to: 'none'
-version: 2.9.0+290
+version: 2.9.1+291
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

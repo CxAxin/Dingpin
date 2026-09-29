@@ -23,6 +23,12 @@ if (flutterVersionName == null) {
 android {
     namespace "com.pinnit.flutter"
     compileSdk flutter.compileSdkVersion
+    // Pinned deliberately: the hand-assembled SDK's build-tools/34.0.0 is a
+    // partial extraction (missing aapt2/zipalign and most of lib/), which makes
+    // AGP abort with "Installed Build Tools revision 34.0.0 is corrupted".
+    // 35.0.0 in the same SDK is complete, so use it explicitly instead of
+    // letting AGP pick its (broken) default.
+    buildToolsVersion = "35.0.0"
     // Only NDK 28.2 is a complete install in the hand-assembled SDK used here
     // (the 26.3/27.0 folders beside it are partial extractions with no
     // source.properties). path_provider_android -> jni ships CMake native

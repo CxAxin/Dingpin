@@ -8,6 +8,27 @@ All notable changes to **Dingpin（顶顶）** are documented here.
 > contains relative to the last tagged release (`v2.6.7`), and marks what is
 > genuinely *new since 2.8.8*.
 
+## [2.9.1] - 2026-09-30
+
+### 🎨 Brand refresh — new app icon
+- **Replaced the launcher icon.** The old icon was still the inherited Pinnit
+  artwork (red plastic pushpin on a **purple `#6750A4`** card), which clashed
+  with the app's current warm-gold / warm-ivory theme.
+- New icon: **warm-ivory card (`#F3E8DD`) + gold pushpin**, angled, with the
+  pin isolated onto the foreground layer so it survives every system mask
+  (circle / squircle / rounded square) without clipping.
+- Full asset set regenerated: `mipmap-*` 48→192px launcher + round icons,
+  `drawable-*dpi/ic_launcher_foreground.png`, adaptive-icon XML, and a fresh
+  512px Play Store master.
+- ⚠️ **Fixed a latent bug:** `res/drawable/ic_launcher_background.xml` had a
+  hard-coded legacy purple `#6750A4`. Being density-independent, it
+  **overrode** all density-specific PNG layers — so any icon change would have
+  kept a purple background. Now `#F3E8DD`.
+- Removed conflicting leftovers: old `drawable/ic_launcher_foreground.png`
+  and `drawable-*/ic_launcher_background.png`.
+- Reusable generator added at `tools/rebrand_icon.py` (change `SRC` at the
+  top and re-run to swap artwork).
+
 ## [2.9.0] - 2026-09-23
 
 ### ✨ Animation Phase 2（动效二期）— new in 2.9.0
