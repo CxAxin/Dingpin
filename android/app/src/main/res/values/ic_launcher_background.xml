@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand refresh 2026-09: warm ivory card, replaced the legacy purple #6750A4. -->
-    <color name="ic_launcher_background">#F3E8DD</color>
+    <!-- Brand refresh 2026-09: warm sand card (cartoon line-art pin),
+         replaced the legacy purple #6750A4. -->
+    <color name="ic_launcher_background">#FEE8D2</color>
 </resources>

@@ -1,6 +1,6 @@
 """
-Dingpin rebrand: turn the supplied square logo (warm ivory card + gold pushpin)
-into the full Android launcher-icon set.
+Dingpin rebrand: turn the supplied square logo (warm sand card + cartoon
+line-art pushpin) into the full Android launcher-icon set.
 
 Run:
   <python> tools/rebrand_icon.py
@@ -10,8 +10,8 @@ Outputs (into android/app/src/main/res/):
   mipmap-{...}/ic_launcher_round.png          (circle-cropped legacy)
   mipmap-anydpi-v26/ic_launcher.xml           (adaptive icon)
   mipmap-anydpi-v26/ic_launcher_round.xml
-  drawable-{...}/ic_launcher_foreground.png   (transparent, gold pin centred+scaled)
-  values/ic_launcher_background.xml           (flat warm-ivory background COLOUR)
+  drawable-{...}/ic_launcher_foreground.png   (transparent, pin centred+scaled)
+  values/ic_launcher_background.xml           (flat warm-sand background COLOUR)
                                               -> must be res/values/, referenced as @color/...
                                                  from the adaptive XML. Putting it under
                                                  res/drawable/ makes aapt2 emit a drawable
@@ -19,6 +19,12 @@ Outputs (into android/app/src/main/res/):
                                                  silently falls back to the default icon.
   + master copies under tools/icon_master/
   + android/app/src/main/ic_launcher-playstore.png (512 Play Store master)
+
+Artwork note: the pin's inner highlight/needle core is painted in the *card
+colour* (≈254,231,209), i.e. it is negative space. The saturation key below
+makes those pixels transparent, which is exactly right — the adaptive
+background is the same card colour, so the "holes" read as the original
+highlight.
 """
 from __future__ import annotations
 
@@ -28,21 +34,25 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFilter
 
-SRC = r"C:\Users\27218\.workbuddy\clipboard-images\clipboard-2026-09-29T18-35-31-671Z-d6983ee1.jpg"
+SRC = r"C:\Users\27218\.workbuddy\clipboard-images\clipboard-2026-09-30T02-19-57-537Z-18029500.jpg"
 HERE = os.path.dirname(os.path.abspath(__file__))
 APP = os.path.dirname(HERE)
 RES = os.path.join(APP, "android", "app", "src", "main", "res")
 MASTER = os.path.join(HERE, "icon_master")
 
-# The card in the source sits at roughly x/y 61..1194 with a soft 1px rim
-# just inside; crop a hair inside that so no white halo survives.
-CROP = (63, 63, 1193, 1193)          # 1130 x 1130
+# The source is a full-bleed 1920px card (no white rim, no visible border).
+# Inset a few px so no JPEG edge ringing survives at the icon border.
+CROP = (6, 6, 1914, 1914)             # 1908 x 1908
 
 # --- adaptive icon geometry (all values in the 108dp canvas) -------------
 CANVAS = 108
-SAFE = 66                             # guaranteed-visible circle (r = 33)
+# Pin height as a fraction of the 108dp canvas. Only the middle 72dp of the
+# canvas is actually visible once the system mask is applied, and 0.48 puts the
+# pin at ~72% of the visible icon height — the usual launcher-glyph proportion.
+# (0.56 => 84%, noticeably cramped; 0.40 => 60%, a bit small.)
+FG_PIN_RATIO = 0.48
 PIN_SAT_CUT = 100                     # saturation threshold that isolates the pin
-FG_PIN_COVER = 0.98                   # fraction of the *pin* on the fg layer
+FG_PIN_COVER = 1.0                    # keep the whole pin, needle tip included
 
 DENSITIES = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
 ADAPTIVE_PX = {"mdpi": 108, "hdpi": 162, "xhdpi": 216, "xxhdpi": 324, "xxxhdpi": 432}
@@ -121,7 +131,7 @@ def cut_pin(card: Image.Image) -> Image.Image:
 
 
 def advance_pin(pin: Image.Image, cover: float) -> Image.Image:
-    """Foreground layer: drop the very needle tip (it is below the safe zone)."""
+    """Foreground layer crop. With cover=1.0 the whole pin is kept."""
     w, h = pin.size
     keep = max(1, int(round(h * cover)))
     return pin.crop((0, 0, w, keep))
@@ -167,14 +177,14 @@ def build() -> None:
         os.makedirs(ap_dir, exist_ok=True)
 
         fg = Image.new("RGBA", (apx, apx), (0, 0, 0, 0))
-        safe = int(round(SAFE / CANVAS * apx))
+        target_h = int(round(FG_PIN_RATIO * apx))
         adv = advance_pin(pin, FG_PIN_COVER)
-        scale = safe / max(adv.size)
+        scale = target_h / adv.size[1]
         fw, fh = max(1, int(round(adv.size[0] * scale))), max(1, int(round(adv.size[1] * scale)))
         fg.alpha_composite(adv.resize((fw, fh), Image.LANCZOS),
                            ((apx - fw) // 2, (apx - fh) // 2))
         fg.save(os.path.join(ap_dir, "ic_launcher_foreground.png"))
-        print(f"  {dens}: adaptive fg {apx}x{apx}  (pin {fw}x{fh} in safe {safe})")
+        print(f"  {dens}: adaptive fg {apx}x{apx}  (pin {fw}x{fh} = {FG_PIN_RATIO:.0%} of canvas)")
 
     # background layer = flat colour resource. It MUST live in res/values/ so aapt2
     # compiles it into the `color` table; referenced as @color/... from the adaptive XML.
@@ -183,7 +193,8 @@ def build() -> None:
         fh.write(
             '<?xml version="1.0" encoding="utf-8"?>\n'
             "<resources>\n"
-            "    <!-- Brand refresh 2026-09: warm ivory card, replaced the legacy purple #6750A4. -->\n"
+            "    <!-- Brand refresh 2026-09: warm sand card (cartoon line-art pin),\n"
+            "         replaced the legacy purple #6750A4. -->\n"
             f'    <color name="ic_launcher_background">{hex_bg}</color>\n'
             "</resources>\n"
         )

@@ -8,6 +8,43 @@ All notable changes to **Dingpin（顶顶）** are documented here.
 > contains relative to the last tagged release (`v2.6.7`), and marks what is
 > genuinely *new since 2.8.8*.
 
+## [2.9.3] - 2026-09-30
+
+### 🎨 Brand refresh — third-generation app icon
+- **New artwork:** the pin is redrawn as a **cartoon line-art pin** — thick dark
+  outline, flat brass/bronze fill, tilted ~30°, on a **warm sand card
+  (`#FEE8D2`)**. Replaces the soft-gradient artwork of 2.9.1.
+- The pin's inner highlight (body edge + needle core) is painted in the *card
+  colour* in the source art — i.e. negative space. The saturation key lifts
+  those pixels out to transparency, and because the adaptive background is the
+  same sand colour the "holes" read exactly like the original highlight.
+- **Foreground sizing reworked:** the old rule scaled the pin to the 66dp safe
+  zone, which under the real adaptive mask (only the middle 72dp of the 108dp
+  canvas is visible) put the pin at ~91% of the icon height — cramped. It is now
+  sized to **48% of the canvas ≈ 72% of the visible icon**, the usual
+  launcher-glyph proportion. The needle tip is no longer truncated.
+- Background colour resource updated to `#FEE8D2`; full asset set (legacy
+  square + round mipmaps 48→192px, adaptive foregrounds 108→432px, 512px Play
+  Store master) regenerated from the new master via `tools/rebrand_icon.py`.
+
+## [2.9.2] - 2026-09-30
+
+### 🐛 Fix — launcher icon fell back to the system default
+- **Symptom:** after installing 2.9.1 the launcher / package-installer showed
+  the **stock Android icon** (MIUI's blue-and-white face) instead of the new
+  gold-pushpin artwork.
+- **Root cause:** `res/values/ic_launcher_background.xml` had been written into
+  `res/drawable/` instead. A `<resources><color>…</color></resources>` file is
+  **not** a valid drawable, so `mipmap-anydpi-v26/ic_launcher.xml`'s
+  `<background android:drawable="@drawable/ic_launcher_background" />` failed to
+  resolve. Android then discards the whole `AdaptiveIconDrawable` and falls back
+  to the default icon — which is why the artwork looked "not applied at all".
+- **Fix:** the colour now lives in `res/values/ic_launcher_background.xml` (a
+  real `<color>` resource) and the adaptive-icon XMLs reference it as
+  `@color/ic_launcher_background`. The stale `res/drawable/` copy is deleted.
+- `tools/rebrand_icon.py` updated so re-running it writes to the correct
+  location (no regression on the next artwork swap).
+
 ## [2.9.1] - 2026-09-30
 
 ### 🎨 Brand refresh — new app icon
@@ -28,24 +65,6 @@ All notable changes to **Dingpin（顶顶）** are documented here.
   and `drawable-*/ic_launcher_background.png`.
 - Reusable generator added at `tools/rebrand_icon.py` (change `SRC` at the
   top and re-run to swap artwork).
-
-## [2.9.2] - 2026-09-30
-
-### 🐛 Fix — launcher icon fell back to the system default
-- **Symptom:** after installing 2.9.1 the launcher / package-installer showed
-  the **stock Android icon** (MIUI's blue-and-white face) instead of the new
-  gold-pushpin artwork.
-- **Root cause:** `res/values/ic_launcher_background.xml` had been written into
-  `res/drawable/` instead. A `<resources><color>…</color></resources>` file is
-  **not** a valid drawable, so `mipmap-anydpi-v26/ic_launcher.xml`'s
-  `<background android:drawable="@drawable/ic_launcher_background" />` failed to
-  resolve. Android then discards the whole `AdaptiveIconDrawable` and falls back
-  to the default icon — which is why the artwork looked "not applied at all".
-- **Fix:** the colour now lives in `res/values/ic_launcher_background.xml` (a
-  real `<color>` resource) and the adaptive-icon XMLs reference it as
-  `@color/ic_launcher_background`. The stale `res/drawable/` copy is deleted.
-- `tools/rebrand_icon.py` updated so re-running it writes to the correct
-  location (no regression on the next artwork swap).
 
 ## [2.9.0] - 2026-09-23
 
