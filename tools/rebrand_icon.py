@@ -11,7 +11,12 @@ Outputs (into android/app/src/main/res/):
   mipmap-anydpi-v26/ic_launcher.xml           (adaptive icon)
   mipmap-anydpi-v26/ic_launcher_round.xml
   drawable-{...}/ic_launcher_foreground.png   (transparent, gold pin centred+scaled)
-  drawable/ic_launcher_background.xml         (flat warm-ivory background colour)
+  values/ic_launcher_background.xml           (flat warm-ivory background COLOUR)
+                                              -> must be res/values/, referenced as @color/...
+                                                 from the adaptive XML. Putting it under
+                                                 res/drawable/ makes aapt2 emit a drawable
+                                                 XML that crashes AdaptiveIconDrawable and
+                                                 silently falls back to the default icon.
   + master copies under tools/icon_master/
   + android/app/src/main/ic_launcher-playstore.png (512 Play Store master)
 """
@@ -134,8 +139,14 @@ def build() -> None:
     card.resize((1024, 1024), Image.LANCZOS).save(os.path.join(MASTER, "master_card_1024_r.png"))
     pin.save(os.path.join(MASTER, "master_pin.png"))
 
-    for name in ("mipmap-anydpi-v26", "drawable"):
+    for name in ("mipmap-anydpi-v26", "values"):
         os.makedirs(os.path.join(RES, name), exist_ok=True)
+    # a leftover colour resource under res/drawable/ compiles into a drawable XML
+    # that AdaptiveIconDrawable cannot parse -> whole icon falls back to default.
+    stale = os.path.join(RES, "drawable", "ic_launcher_background.xml")
+    if os.path.exists(stale):
+        os.remove(stale)
+        print("removed stale drawable/ic_launcher_background.xml")
 
     for dens, px in DENSITIES.items():
         out = os.path.join(RES, f"mipmap-{dens}")
@@ -165,9 +176,10 @@ def build() -> None:
         fg.save(os.path.join(ap_dir, "ic_launcher_foreground.png"))
         print(f"  {dens}: adaptive fg {apx}x{apx}  (pin {fw}x{fh} in safe {safe})")
 
-    # background layer = flat colour resource (density-independent, overrides PNGs)
+    # background layer = flat colour resource. It MUST live in res/values/ so aapt2
+    # compiles it into the `color` table; referenced as @color/... from the adaptive XML.
     hex_bg = "#%02X%02X%02X" % bg_rgb
-    with open(os.path.join(RES, "drawable", "ic_launcher_background.xml"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(RES, "values", "ic_launcher_background.xml"), "w", encoding="utf-8") as fh:
         fh.write(
             '<?xml version="1.0" encoding="utf-8"?>\n'
             "<resources>\n"
@@ -175,13 +187,13 @@ def build() -> None:
             f'    <color name="ic_launcher_background">{hex_bg}</color>\n'
             "</resources>\n"
         )
-    print("background colour ->", hex_bg)
+    print("background colour ->", hex_bg, "(res/values/)")
 
     # adaptive XML
     xml = (
         '<?xml version="1.0" encoding="utf-8"?>\n'
         '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
-        '    <background android:drawable="@drawable/ic_launcher_background" />\n'
+        '    <background android:drawable="@color/ic_launcher_background" />\n'
         '    <foreground android:drawable="@drawable/ic_launcher_foreground" />\n'
         '</adaptive-icon>\n'
     )

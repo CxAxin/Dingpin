@@ -29,6 +29,24 @@ All notable changes to **Dingpin（顶顶）** are documented here.
 - Reusable generator added at `tools/rebrand_icon.py` (change `SRC` at the
   top and re-run to swap artwork).
 
+## [2.9.2] - 2026-09-30
+
+### 🐛 Fix — launcher icon fell back to the system default
+- **Symptom:** after installing 2.9.1 the launcher / package-installer showed
+  the **stock Android icon** (MIUI's blue-and-white face) instead of the new
+  gold-pushpin artwork.
+- **Root cause:** `res/values/ic_launcher_background.xml` had been written into
+  `res/drawable/` instead. A `<resources><color>…</color></resources>` file is
+  **not** a valid drawable, so `mipmap-anydpi-v26/ic_launcher.xml`'s
+  `<background android:drawable="@drawable/ic_launcher_background" />` failed to
+  resolve. Android then discards the whole `AdaptiveIconDrawable` and falls back
+  to the default icon — which is why the artwork looked "not applied at all".
+- **Fix:** the colour now lives in `res/values/ic_launcher_background.xml` (a
+  real `<color>` resource) and the adaptive-icon XMLs reference it as
+  `@color/ic_launcher_background`. The stale `res/drawable/` copy is deleted.
+- `tools/rebrand_icon.py` updated so re-running it writes to the correct
+  location (no regression on the next artwork swap).
+
 ## [2.9.0] - 2026-09-23
 
 ### ✨ Animation Phase 2（动效二期）— new in 2.9.0
